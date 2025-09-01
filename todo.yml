@@ -1,3 +1,5 @@
+- task: "Implement PDF Compression Service"
+- task: "Implement PDF to Word Conversion"
 - task: "Implement PDF Annotation (e.g., Watermarking)"
 - task: "Implement PDF Protection (Password Encryption)"
 - task: "Implement AI-powered OCR"
