@@ -36,7 +36,6 @@ public class PdfController {
 
             return new ResponseEntity<>(mergedPdfBytes, headers, HttpStatus.OK);
         } catch (IOException e) {
-            // A simple error handling. In a real app, we would log this and might have a more sophisticated error response.
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(("Failed to merge PDFs: " + e.getMessage()).getBytes());
         }
     }
