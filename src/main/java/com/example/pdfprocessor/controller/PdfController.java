@@ -40,4 +40,23 @@ public class PdfController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(("Failed to merge PDFs: " + e.getMessage()).getBytes());
         }
     }
+
+    @PostMapping("/split")
+    public ResponseEntity<byte[]> splitPdf(@RequestParam("file") MultipartFile file) {
+        if (file.isEmpty()) {
+            return ResponseEntity.badRequest().body("Please provide a file to split.".getBytes());
+        }
+
+        try {
+            byte[] splitPdfZipBytes = pdfService.splitPdf(file);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            headers.setContentDispositionFormData("attachment", "split_documents.zip");
+
+            return new ResponseEntity<>(splitPdfZipBytes, headers, HttpStatus.OK);
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(("Failed to split PDF: " + e.getMessage()).getBytes());
+        }
+    }
 }

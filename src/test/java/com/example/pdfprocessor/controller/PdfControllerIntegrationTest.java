@@ -15,10 +15,13 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.zip.ZipInputStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -30,19 +33,20 @@ public class PdfControllerIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
 
-    private byte[] createDummyPdf(String text) throws IOException {
+    private byte[] createDummyPdf(int numPages) throws IOException {
         try (PDDocument document = new PDDocument(); ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-            PDPage page = new PDPage();
-            document.addPage(page);
+            for (int i = 1; i <= numPages; i++) {
+                PDPage page = new PDPage();
+                document.addPage(page);
 
-            PDPageContentStream contentStream = new PDPageContentStream(document, page);
-            contentStream.beginText();
-            contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 12);
-            contentStream.newLineAtOffset(100, 700);
-            contentStream.showText(text);
-            contentStream.endText();
-            contentStream.close();
-
+                PDPageContentStream contentStream = new PDPageContentStream(document, page);
+                contentStream.beginText();
+                contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 12);
+                contentStream.newLineAtOffset(100, 700);
+                contentStream.showText("This is page " + i + ".");
+                contentStream.endText();
+                contentStream.close();
+            }
             document.save(outputStream);
             return outputStream.toByteArray();
         }
@@ -50,8 +54,8 @@ public class PdfControllerIntegrationTest {
 
     @Test
     void shouldMergePdfsSuccessfully() throws Exception {
-        byte[] pdfContent1 = createDummyPdf("This is the first PDF.");
-        byte[] pdfContent2 = createDummyPdf("This is the second PDF.");
+        byte[] pdfContent1 = createDummyPdf(1);
+        byte[] pdfContent2 = createDummyPdf(1);
 
         MockMultipartFile file1 = new MockMultipartFile(
                 "file1",
@@ -77,6 +81,50 @@ public class PdfControllerIntegrationTest {
         byte[] responseBytes = result.getResponse().getContentAsByteArray();
         try (PDDocument mergedDoc = Loader.loadPDF(responseBytes)) {
             assertEquals(2, mergedDoc.getNumberOfPages());
+        }
+    }
+
+    @Test
+    void shouldSplitPdfSuccessfully() throws Exception {
+        // 1. Create a 3-page PDF
+        int numPages = 3;
+        byte[] pdfContent = createDummyPdf(numPages);
+
+        // 2. Create a MockMultipartFile
+        MockMultipartFile file = new MockMultipartFile(
+                "file",
+                "test_3_pages.pdf",
+                MediaType.APPLICATION_PDF_VALUE,
+                pdfContent
+        );
+
+        // 3. Perform the multipart POST request
+        MvcResult result = mockMvc.perform(multipart("/api/v1/pdfs/split")
+                        .file(file))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_OCTET_STREAM))
+                .andReturn();
+
+        // 4. Validate the returned zip archive
+        byte[] responseBytes = result.getResponse().getContentAsByteArray();
+        try (ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(responseBytes))) {
+            int fileCount = 0;
+            while (zis.getNextEntry() != null) {
+                fileCount++;
+                // Read the bytes of the zip entry
+                ByteArrayOutputStream entryBytes = new ByteArrayOutputStream();
+                byte[] buffer = new byte[1024];
+                int len;
+                while ((len = zis.read(buffer)) > 0) {
+                    entryBytes.write(buffer, 0, len);
+                }
+
+                // Verify that each entry is a valid, single-page PDF
+                try (PDDocument singlePageDoc = Loader.loadPDF(entryBytes.toByteArray())) {
+                    assertEquals(1, singlePageDoc.getNumberOfPages(), "Each PDF in the zip should have exactly one page.");
+                }
+            }
+            assertEquals(numPages, fileCount, "The zip archive should contain the same number of files as pages in the source PDF.");
         }
     }
 }
