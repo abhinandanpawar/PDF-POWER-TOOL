@@ -30,6 +30,8 @@
         <module>pdf-split</module>
         <module>pdf-compress</module>
         <module>pdf-convert</module>
+        <module>pdf-protect</module>
+        <module>pdf-annotate</module>
     </modules>
 
     <dependencyManagement>
@@ -58,6 +60,16 @@
             <dependency>
                 <groupId>com.example</groupId>
                 <artifactId>pdf-convert</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.example</groupId>
+                <artifactId>pdf-protect</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.example</groupId>
+                <artifactId>pdf-annotate</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

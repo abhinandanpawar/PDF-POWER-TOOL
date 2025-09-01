@@ -36,6 +36,14 @@
             <groupId>com.example</groupId>
             <artifactId>pdf-convert</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.example</groupId>
+            <artifactId>pdf-protect</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.example</groupId>
+            <artifactId>pdf-annotate</artifactId>
+        </dependency>
 
         <!-- Spring Boot -->
         <dependency>
