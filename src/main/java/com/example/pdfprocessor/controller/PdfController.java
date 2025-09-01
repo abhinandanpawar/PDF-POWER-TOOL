@@ -41,21 +41,46 @@ public class PdfController {
     }
 
     @PostMapping("/split")
-    public ResponseEntity<byte[]> splitPdf(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<byte[]> splitPdf(@RequestParam("file") MultipartFile file,
+                                           @RequestParam(required = false) String ranges) {
         if (file.isEmpty()) {
             return ResponseEntity.badRequest().body("Please provide a file to split.".getBytes());
         }
 
         try {
-            byte[] splitPdfZipBytes = pdfService.splitPdf(file);
-
+            byte[] resultBytes = pdfService.splitPdf(file, ranges);
             HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-            headers.setContentDispositionFormData("attachment", "split_documents.zip");
 
-            return new ResponseEntity<>(splitPdfZipBytes, headers, HttpStatus.OK);
+            if (ranges == null || ranges.trim().isEmpty()) {
+                headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+                headers.setContentDispositionFormData("attachment", "split_documents.zip");
+            } else {
+                headers.setContentType(MediaType.APPLICATION_PDF);
+                headers.setContentDispositionFormData("attachment", "split_pages.pdf");
+            }
+
+            return new ResponseEntity<>(resultBytes, headers, HttpStatus.OK);
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(("Failed to split PDF: " + e.getMessage()).getBytes());
+        }
+    }
+
+    @PostMapping("/compress")
+    public ResponseEntity<byte[]> compressPdf(@RequestParam("file") MultipartFile file) {
+        if (file.isEmpty()) {
+            return ResponseEntity.badRequest().body("Please provide a file to compress.".getBytes());
+        }
+
+        try {
+            byte[] compressedPdfBytes = pdfService.compressPdf(file);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDispositionFormData("attachment", "compressed.pdf");
+
+            return new ResponseEntity<>(compressedPdfBytes, headers, HttpStatus.OK);
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(("Failed to compress PDF: " + e.getMessage()).getBytes());
         }
     }
 }

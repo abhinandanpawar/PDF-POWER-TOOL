@@ -10,6 +10,10 @@ import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.imageio.ImageIO;
+import java.awt.Color;
+import java.awt.image.BufferedImage;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -87,7 +91,7 @@ public class PdfControllerIntegrationTest {
     }
 
     @Test
-    void shouldSplitPdfSuccessfully() throws Exception {
+    void shouldSplitPdfIntoAllPagesSuccessfully() throws Exception {
         int numPages = 3;
         byte[] pdfContent = createDummyPdf(numPages);
 
@@ -121,6 +125,87 @@ public class PdfControllerIntegrationTest {
                 }
             }
             assertEquals(numPages, fileCount, "The zip archive should contain the same number of files as pages in the source PDF.");
+        }
+    }
+
+    @Test
+    void shouldSplitPdfByPageRange() throws Exception {
+        byte[] pdfContent = createDummyPdf(5); // Create a 5-page PDF
+
+        MockMultipartFile file = new MockMultipartFile(
+                "file", "test_5_pages.pdf", MediaType.APPLICATION_PDF_VALUE, pdfContent);
+
+        MvcResult result = mockMvc.perform(multipart("/api/v1/pdfs/split")
+                        .file(file)
+                        .param("ranges", "2-3,5"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_PDF))
+                .andReturn();
+
+        byte[] responseBytes = result.getResponse().getContentAsByteArray();
+        try (PDDocument resultDoc = Loader.loadPDF(responseBytes)) {
+            assertEquals(3, resultDoc.getNumberOfPages(), "The resulting PDF should have 3 pages (2, 3, and 5).");
+        }
+    }
+
+    private byte[] createDummyImage(int width, int height) throws IOException {
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        java.awt.Graphics2D g = image.createGraphics();
+        g.setColor(Color.RED);
+        g.fillRect(0, 0, width, height);
+        g.dispose();
+
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            ImageIO.write(image, "bmp", baos); // BMP is uncompressed
+            return baos.toByteArray();
+        }
+    }
+
+    private byte[] createPdfWithImage(byte[] imageBytes) throws IOException {
+        try (PDDocument doc = new PDDocument()) {
+            PDPage page = new PDPage();
+            doc.addPage(page);
+            PDImageXObject pdImage = PDImageXObject.createFromByteArray(doc, imageBytes, "image");
+
+            try (PDPageContentStream contentStream = new PDPageContentStream(doc, page)) {
+                contentStream.drawImage(pdImage, 70, 250, pdImage.getWidth() / 2, pdImage.getHeight() / 2);
+            }
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            doc.save(baos);
+            return baos.toByteArray();
+        }
+    }
+
+    @Test
+    void shouldCompressPdfSuccessfully() throws Exception {
+        byte[] imageBytes = createDummyImage(200, 200);
+        byte[] pdfWithImageBytes = createPdfWithImage(imageBytes);
+
+        MockMultipartFile file = new MockMultipartFile(
+                "file", "uncompressed.pdf", MediaType.APPLICATION_PDF_VALUE, pdfWithImageBytes);
+
+        MvcResult result = mockMvc.perform(multipart("/api/v1/pdfs/compress")
+                        .file(file))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_PDF))
+                .andReturn();
+
+        byte[] responseBytes = result.getResponse().getContentAsByteArray();
+        assertTrue(responseBytes.length > 0, "Compressed PDF should not be empty.");
+
+        try (PDDocument compressedDoc = Loader.loadPDF(responseBytes)) {
+            assertEquals(1, compressedDoc.getNumberOfPages());
+            PDPage firstPage = compressedDoc.getPage(0);
+            boolean jpegFound = false;
+            for (COSName name : firstPage.getResources().getXObjectNames()) {
+                if (firstPage.getResources().getXObject(name) instanceof PDImageXObject) {
+                    PDImageXObject image = (PDImageXObject) firstPage.getResources().getXObject(name);
+                    assertEquals("jpg", image.getSuffix());
+                    jpegFound = true;
+                }
+            }
+            assertTrue(jpegFound, "A JPEG image should be found in the compressed PDF.");
         }
     }
 }
