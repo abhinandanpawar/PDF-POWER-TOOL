@@ -1,5 +1,6 @@
 package com.example.pdfprocessor.controller;
 
+import com.example.pdfprocessor.api.PdfCompressService;
 import com.example.pdfprocessor.api.PdfMergeService;
 import com.example.pdfprocessor.api.PdfSplitService;
 import org.springframework.http.HttpHeaders;
@@ -17,10 +18,12 @@ public class PdfController {
 
     private final PdfMergeService pdfMergeService;
     private final PdfSplitService pdfSplitService;
+    private final PdfCompressService pdfCompressService;
 
-    public PdfController(PdfMergeService pdfMergeService, PdfSplitService pdfSplitService) {
+    public PdfController(PdfMergeService pdfMergeService, PdfSplitService pdfSplitService, PdfCompressService pdfCompressService) {
         this.pdfMergeService = pdfMergeService;
         this.pdfSplitService = pdfSplitService;
+        this.pdfCompressService = pdfCompressService;
     }
 
     @PostMapping("/merge")
@@ -61,6 +64,23 @@ public class PdfController {
             }
 
             return new ResponseEntity<>(resultBytes, headers, HttpStatus.OK);
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PostMapping("/compress")
+    public ResponseEntity<byte[]> compressPdf(@RequestParam("file") MultipartFile file) {
+        if (file.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        try {
+            byte[] compressedPdfBytes = pdfCompressService.compressPdf(file.getInputStream());
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDispositionFormData("attachment", "compressed.pdf");
+            return new ResponseEntity<>(compressedPdfBytes, headers, HttpStatus.OK);
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }

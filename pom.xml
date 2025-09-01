@@ -28,6 +28,7 @@
         <module>pdf-services-api</module>
         <module>pdf-merge</module>
         <module>pdf-split</module>
+        <module>pdf-compress</module>
     </modules>
 
     <dependencyManagement>
@@ -46,6 +47,11 @@
             <dependency>
                 <groupId>com.example</groupId>
                 <artifactId>pdf-split</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.example</groupId>
+                <artifactId>pdf-compress</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

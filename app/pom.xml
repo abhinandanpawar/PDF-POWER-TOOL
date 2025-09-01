@@ -28,6 +28,10 @@
             <groupId>com.example</groupId>
             <artifactId>pdf-split</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.example</groupId>
+            <artifactId>pdf-compress</artifactId>
+        </dependency>
 
         <!-- Spring Boot -->
         <dependency>
