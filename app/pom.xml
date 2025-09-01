@@ -32,6 +32,10 @@
             <groupId>com.example</groupId>
             <artifactId>pdf-compress</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.example</groupId>
+            <artifactId>pdf-convert</artifactId>
+        </dependency>
 
         <!-- Spring Boot -->
         <dependency>

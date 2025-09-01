@@ -29,6 +29,7 @@
         <module>pdf-merge</module>
         <module>pdf-split</module>
         <module>pdf-compress</module>
+        <module>pdf-convert</module>
     </modules>
 
     <dependencyManagement>
@@ -52,6 +53,11 @@
             <dependency>
                 <groupId>com.example</groupId>
                 <artifactId>pdf-compress</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.example</groupId>
+                <artifactId>pdf-convert</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
