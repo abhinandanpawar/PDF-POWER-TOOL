@@ -7,15 +7,33 @@ import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 @Service
 public class PdfReorderServiceImpl implements PdfReorderService {
 
     @Override
-    public byte[] reorderPages(byte[] pdfBytes, List<Integer> newOrder) throws IOException {
+    public byte[] reorderPages(List<InputStream> files, List<Integer> newOrder) throws IOException {
+        ByteArrayOutputStream zipStream = new ByteArrayOutputStream();
+        try (ZipOutputStream zos = new ZipOutputStream(zipStream)) {
+            int fileNumber = 1;
+            for (InputStream file : files) {
+                byte[] reorderedPdf = reorderSinglePdf(file.readAllBytes(), newOrder);
+                ZipEntry zipEntry = new ZipEntry("reordered_" + fileNumber++ + ".pdf");
+                zos.putNextEntry(zipEntry);
+                zos.write(reorderedPdf);
+                zos.closeEntry();
+            }
+        }
+        return zipStream.toByteArray();
+    }
+
+    private byte[] reorderSinglePdf(byte[] pdfBytes, List<Integer> newOrder) throws IOException {
         try (PDDocument originalDoc = Loader.loadPDF(pdfBytes)) {
             int pageCount = originalDoc.getNumberOfPages();
 

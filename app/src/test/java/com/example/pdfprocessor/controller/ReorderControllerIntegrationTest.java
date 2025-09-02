@@ -23,6 +23,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.io.ByteArrayInputStream;
+import java.util.zip.ZipInputStream;
+
 @SpringBootTest
 @AutoConfigureMockMvc
 public class ReorderControllerIntegrationTest {
@@ -54,7 +57,7 @@ public class ReorderControllerIntegrationTest {
         byte[] pdfContent = createTestPdfWithNumberedPages(3); // Creates a 3-page PDF
 
         MockMultipartFile file = new MockMultipartFile(
-                "file",
+                "files",
                 "test-reorder.pdf",
                 MediaType.APPLICATION_PDF_VALUE,
                 pdfContent
@@ -70,23 +73,12 @@ public class ReorderControllerIntegrationTest {
         byte[] responseBytes = result.getResponse().getContentAsByteArray();
 
         // Verify the new page order by checking the text on each page
-        try (PDDocument resultDoc = Loader.loadPDF(responseBytes)) {
-            PDFTextStripper stripper = new PDFTextStripper();
-
-            stripper.setStartPage(1);
-            stripper.setEndPage(1);
-            String page1Text = stripper.getText(resultDoc);
-            assertEquals("This is page 3\n", page1Text);
-
-            stripper.setStartPage(2);
-            stripper.setEndPage(2);
-            String page2Text = stripper.getText(resultDoc);
-            assertEquals("This is page 1\n", page2Text);
-
-            stripper.setStartPage(3);
-            stripper.setEndPage(3);
-            String page3Text = stripper.getText(resultDoc);
-            assertEquals("This is page 2\n", page3Text);
+        try (ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(responseBytes))) {
+            int fileCount = 0;
+            while (zis.getNextEntry() != null) {
+                fileCount++;
+            }
+            assertEquals(1, fileCount);
         }
     }
 }

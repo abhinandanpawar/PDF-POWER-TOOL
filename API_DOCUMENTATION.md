@@ -161,3 +161,21 @@ This document provides detailed information about the API endpoints for the PDF 
 - **Response:**
   - **Content-Type:** `text/plain`
   - **Body:** A string containing the extracted text from all the files.
+
+
+### Reorder Controller (`/api/v1/pdfs`)
+
+#### Reorder Pages
+
+- **URL:** `/reorder-pages`
+- **Method:** `POST`
+- **Description:** Reorders the pages of multiple PDF documents according to a new specified order.
+- **Request:**
+  - **Content-Type:** `multipart/form-data`
+  - **Body:**
+    - `files`: A list of PDF files.
+    - `order`: A list of 1-based page numbers in the desired new order.
+- **Response:**
+  - **Content-Type:** `application/octet-stream`
+  - **Body:** A ZIP file containing the reordered PDF documents.
+
