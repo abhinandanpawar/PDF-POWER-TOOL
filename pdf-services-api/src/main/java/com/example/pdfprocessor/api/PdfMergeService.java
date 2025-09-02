@@ -2,7 +2,8 @@ package com.example.pdfprocessor.api;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 public interface PdfMergeService {
-    byte[] mergePdfs(InputStream file1, InputStream file2) throws IOException;
+    byte[] mergePdfs(List<InputStream> files) throws IOException;
 }

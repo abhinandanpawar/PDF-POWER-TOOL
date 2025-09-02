@@ -7,15 +7,22 @@ import org.apache.pdfbox.text.PDFTextStripper;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
 
 @Service
 public class TextExtractionServiceImpl implements TextExtractionService {
 
     @Override
-    public String extractText(byte[] pdfBytes) throws IOException {
-        try (PDDocument document = Loader.loadPDF(pdfBytes)) {
-            PDFTextStripper textStripper = new PDFTextStripper();
-            return textStripper.getText(document);
+    public String extractText(List<InputStream> files) throws IOException {
+        StringBuilder combinedText = new StringBuilder();
+        for (InputStream file : files) {
+            try (PDDocument document = Loader.loadPDF(file.readAllBytes())) {
+                PDFTextStripper textStripper = new PDFTextStripper();
+                combinedText.append(textStripper.getText(document));
+                combinedText.append("\n\n--- End of File ---\n\n");
+            }
         }
+        return combinedText.toString();
     }
 }

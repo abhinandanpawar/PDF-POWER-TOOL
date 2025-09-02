@@ -9,12 +9,31 @@ import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 @Service
 public class PdfProtectionServiceImpl implements PdfProtectionService {
 
     @Override
-    public byte[] protectPdf(byte[] pdfBytes, String password) throws IOException {
+    public byte[] protectPdfs(List<InputStream> files, String password) throws IOException {
+        ByteArrayOutputStream zipStream = new ByteArrayOutputStream();
+        try (ZipOutputStream zos = new ZipOutputStream(zipStream)) {
+            int fileNumber = 1;
+            for (InputStream file : files) {
+                byte[] protectedPdf = protectSinglePdf(file.readAllBytes(), password);
+                ZipEntry zipEntry = new ZipEntry("protected_" + fileNumber++ + ".pdf");
+                zos.putNextEntry(zipEntry);
+                zos.write(protectedPdf);
+                zos.closeEntry();
+            }
+        }
+        return zipStream.toByteArray();
+    }
+
+    private byte[] protectSinglePdf(byte[] pdfBytes, String password) throws IOException {
         try (PDDocument document = Loader.loadPDF(pdfBytes)) {
             AccessPermission ap = new AccessPermission();
             // Disallow all modifications

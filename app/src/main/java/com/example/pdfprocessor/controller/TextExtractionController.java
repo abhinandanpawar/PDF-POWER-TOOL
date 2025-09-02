@@ -9,6 +9,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/text")
@@ -21,9 +24,16 @@ public class TextExtractionController {
     }
 
     @PostMapping("/extract")
-    public ResponseEntity<String> extractText(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<String> extractText(@RequestParam("files") List<MultipartFile> files) {
         try {
-            String extractedText = textExtractionService.extractText(file.getBytes());
+            List<InputStream> fileStreams = files.stream().map(file -> {
+                try {
+                    return file.getInputStream();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }).collect(Collectors.toList());
+            String extractedText = textExtractionService.extractText(fileStreams);
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.TEXT_PLAIN);
             return new ResponseEntity<>(extractedText, headers, HttpStatus.OK);

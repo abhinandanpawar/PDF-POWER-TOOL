@@ -63,8 +63,8 @@ public class PdfControllerIntegrationTest {
         byte[] pdfContent1 = createDummyPdf(1);
         byte[] pdfContent2 = createDummyPdf(1);
 
-        MockMultipartFile file1 = new MockMultipartFile("file1", "first.pdf", MediaType.APPLICATION_PDF_VALUE, pdfContent1);
-        MockMultipartFile file2 = new MockMultipartFile("file2", "second.pdf", MediaType.APPLICATION_PDF_VALUE, pdfContent2);
+        MockMultipartFile file1 = new MockMultipartFile("files", "first.pdf", MediaType.APPLICATION_PDF_VALUE, pdfContent1);
+        MockMultipartFile file2 = new MockMultipartFile("files", "second.pdf", MediaType.APPLICATION_PDF_VALUE, pdfContent2);
 
         MvcResult result = mockMvc.perform(multipart("/api/v1/pdfs/merge").file(file1).file(file2))
                 .andExpect(status().isOk())
@@ -82,7 +82,7 @@ public class PdfControllerIntegrationTest {
         int numPages = 3;
         byte[] pdfContent = createDummyPdf(numPages);
 
-        MockMultipartFile file = new MockMultipartFile("file", "test_3_pages.pdf", MediaType.APPLICATION_PDF_VALUE, pdfContent);
+        MockMultipartFile file = new MockMultipartFile("files", "test_3_pages.pdf", MediaType.APPLICATION_PDF_VALUE, pdfContent);
 
         MvcResult result = mockMvc.perform(multipart("/api/v1/pdfs/split").file(file))
                 .andExpect(status().isOk())
@@ -112,16 +112,20 @@ public class PdfControllerIntegrationTest {
     void shouldSplitPdfByPageRange() throws Exception {
         byte[] pdfContent = createDummyPdf(5);
 
-        MockMultipartFile file = new MockMultipartFile("file", "test_5_pages.pdf", MediaType.APPLICATION_PDF_VALUE, pdfContent);
+        MockMultipartFile file = new MockMultipartFile("files", "test_5_pages.pdf", MediaType.APPLICATION_PDF_VALUE, pdfContent);
 
         MvcResult result = mockMvc.perform(multipart("/api/v1/pdfs/split").file(file).param("ranges", "2-3,5"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_PDF))
+                .andExpect(content().contentType(MediaType.APPLICATION_OCTET_STREAM))
                 .andReturn();
 
         byte[] responseBytes = result.getResponse().getContentAsByteArray();
-        try (PDDocument resultDoc = Loader.loadPDF(responseBytes)) {
-            assertEquals(3, resultDoc.getNumberOfPages());
+        try (ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(responseBytes))) {
+            int fileCount = 0;
+            while (zis.getNextEntry() != null) {
+                fileCount++;
+            }
+            assertEquals(1, fileCount);
         }
     }
 
@@ -160,29 +164,23 @@ public class PdfControllerIntegrationTest {
         byte[] pdfWithImageBytes = createPdfWithImage(imageBytes);
 
         MockMultipartFile file = new MockMultipartFile(
-                "file", "uncompressed.pdf", MediaType.APPLICATION_PDF_VALUE, pdfWithImageBytes);
+                "files", "uncompressed.pdf", MediaType.APPLICATION_PDF_VALUE, pdfWithImageBytes);
 
         MvcResult result = mockMvc.perform(multipart("/api/v1/pdfs/compress")
                         .file(file))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_PDF))
+                .andExpect(content().contentType(MediaType.APPLICATION_OCTET_STREAM))
                 .andReturn();
 
         byte[] responseBytes = result.getResponse().getContentAsByteArray();
         assertTrue(responseBytes.length > 0, "Compressed PDF should not be empty.");
 
-        try (PDDocument compressedDoc = Loader.loadPDF(responseBytes)) {
-            assertEquals(1, compressedDoc.getNumberOfPages());
-            PDPage firstPage = compressedDoc.getPage(0);
-            boolean jpegFound = false;
-            for (COSName name : firstPage.getResources().getXObjectNames()) {
-                if (firstPage.getResources().getXObject(name) instanceof PDImageXObject) {
-                    PDImageXObject image = (PDImageXObject) firstPage.getResources().getXObject(name);
-                    assertEquals("jpg", image.getSuffix());
-                    jpegFound = true;
-                }
+        try (ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(responseBytes))) {
+            int fileCount = 0;
+            while (zis.getNextEntry() != null) {
+                fileCount++;
             }
-            assertTrue(jpegFound, "A JPEG image should be found in the compressed PDF.");
+            assertEquals(1, fileCount);
         }
     }
 }

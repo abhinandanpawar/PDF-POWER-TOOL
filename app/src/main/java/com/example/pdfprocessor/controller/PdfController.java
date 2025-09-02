@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/pdfs")
@@ -27,14 +30,20 @@ public class PdfController {
     }
 
     @PostMapping("/merge")
-    public ResponseEntity<byte[]> mergePdfs(@RequestParam("file1") MultipartFile file1,
-                                            @RequestParam("file2") MultipartFile file2) {
-        if (file1.isEmpty() || file2.isEmpty()) {
+    public ResponseEntity<byte[]> mergePdfs(@RequestParam("files") List<MultipartFile> files) {
+        if (files.isEmpty() || files.stream().anyMatch(MultipartFile::isEmpty)) {
             return ResponseEntity.badRequest().build();
         }
 
         try {
-            byte[] mergedPdfBytes = pdfMergeService.mergePdfs(file1.getInputStream(), file2.getInputStream());
+            List<InputStream> fileStreams = files.stream().map(file -> {
+                try {
+                    return file.getInputStream();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }).collect(Collectors.toList());
+            byte[] mergedPdfBytes = pdfMergeService.mergePdfs(fileStreams);
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_PDF);
             headers.setContentDispositionFormData("attachment", "merged.pdf");
@@ -45,24 +54,24 @@ public class PdfController {
     }
 
     @PostMapping("/split")
-    public ResponseEntity<byte[]> splitPdf(@RequestParam("file") MultipartFile file,
+    public ResponseEntity<byte[]> splitPdfs(@RequestParam("files") List<MultipartFile> files,
                                            @RequestParam(required = false) String ranges) {
-        if (file.isEmpty()) {
+        if (files.isEmpty() || files.stream().anyMatch(MultipartFile::isEmpty)) {
             return ResponseEntity.badRequest().build();
         }
 
         try {
-            byte[] resultBytes = pdfSplitService.splitPdf(file.getInputStream(), ranges);
+            List<InputStream> fileStreams = files.stream().map(file -> {
+                try {
+                    return file.getInputStream();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }).collect(Collectors.toList());
+            byte[] resultBytes = pdfSplitService.splitPdfs(fileStreams, ranges);
             HttpHeaders headers = new HttpHeaders();
-
-            if (ranges == null || ranges.trim().isEmpty()) {
-                headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-                headers.setContentDispositionFormData("attachment", "split_documents.zip");
-            } else {
-                headers.setContentType(MediaType.APPLICATION_PDF);
-                headers.setContentDispositionFormData("attachment", "split_pages.pdf");
-            }
-
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            headers.setContentDispositionFormData("attachment", "split.zip");
             return new ResponseEntity<>(resultBytes, headers, HttpStatus.OK);
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -70,16 +79,23 @@ public class PdfController {
     }
 
     @PostMapping("/compress")
-    public ResponseEntity<byte[]> compressPdf(@RequestParam("file") MultipartFile file) {
-        if (file.isEmpty()) {
+    public ResponseEntity<byte[]> compressPdfs(@RequestParam("files") List<MultipartFile> files) {
+        if (files.isEmpty() || files.stream().anyMatch(MultipartFile::isEmpty)) {
             return ResponseEntity.badRequest().build();
         }
 
         try {
-            byte[] compressedPdfBytes = pdfCompressService.compressPdf(file.getInputStream());
+            List<InputStream> fileStreams = files.stream().map(file -> {
+                try {
+                    return file.getInputStream();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }).collect(Collectors.toList());
+            byte[] compressedPdfBytes = pdfCompressService.compressPdfs(fileStreams);
             HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_PDF);
-            headers.setContentDispositionFormData("attachment", "compressed.pdf");
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            headers.setContentDispositionFormData("attachment", "compressed.zip");
             return new ResponseEntity<>(compressedPdfBytes, headers, HttpStatus.OK);
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

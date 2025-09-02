@@ -20,12 +20,30 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 @Service
 public class PdfCompressServiceImpl implements PdfCompressService {
 
     @Override
-    public byte[] compressPdf(InputStream file) throws IOException {
+    public byte[] compressPdfs(List<InputStream> files) throws IOException {
+        ByteArrayOutputStream zipStream = new ByteArrayOutputStream();
+        try (ZipOutputStream zos = new ZipOutputStream(zipStream)) {
+            int fileNumber = 1;
+            for (InputStream file : files) {
+                byte[] compressedPdf = compressSinglePdf(file);
+                ZipEntry zipEntry = new ZipEntry("compressed_" + fileNumber++ + ".pdf");
+                zos.putNextEntry(zipEntry);
+                zos.write(compressedPdf);
+                zos.closeEntry();
+            }
+        }
+        return zipStream.toByteArray();
+    }
+
+    private byte[] compressSinglePdf(InputStream file) throws IOException {
         try (PDDocument document = Loader.loadPDF(file.readAllBytes())) {
             for (PDPage page : document.getPages()) {
                 PDResources resources = page.getResources();
