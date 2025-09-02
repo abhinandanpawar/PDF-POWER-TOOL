@@ -33,6 +33,8 @@
         <module>pdf-protect</module>
         <module>pdf-annotate</module>
         <module>pdf-text-extraction</module>
+        <module>pdf-page-deletion</module>
+        <module>pdf-to-image</module>
     </modules>
 
     <dependencyManagement>
@@ -76,6 +78,16 @@
             <dependency>
                 <groupId>com.example</groupId>
                 <artifactId>pdf-text-extraction</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.example</groupId>
+                <artifactId>pdf-page-deletion</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.example</groupId>
+                <artifactId>pdf-to-image</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
