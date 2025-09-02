@@ -10,6 +10,8 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -17,22 +19,26 @@ import java.util.zip.ZipOutputStream;
 public class PdfToImageServiceImpl implements PdfToImageService {
 
     @Override
-    public byte[] convertPdfToImages(byte[] pdfBytes, String format, int dpi) throws IOException {
+    public byte[] convertPdfsToImages(List<InputStream> files, String format, int dpi) throws IOException {
         ByteArrayOutputStream zipBaos = new ByteArrayOutputStream();
-        try (ZipOutputStream zos = new ZipOutputStream(zipBaos);
-             PDDocument document = Loader.loadPDF(pdfBytes)) {
+        try (ZipOutputStream zos = new ZipOutputStream(zipBaos)) {
+            int fileNum = 1;
+            for (InputStream file : files) {
+                try (PDDocument document = Loader.loadPDF(file.readAllBytes())) {
+                    PDFRenderer pdfRenderer = new PDFRenderer(document);
+                    for (int page = 0; page < document.getNumberOfPages(); ++page) {
+                        BufferedImage bim = pdfRenderer.renderImageWithDPI(page, dpi);
 
-            PDFRenderer pdfRenderer = new PDFRenderer(document);
-            for (int page = 0; page < document.getNumberOfPages(); ++page) {
-                BufferedImage bim = pdfRenderer.renderImageWithDPI(page, dpi);
+                        ByteArrayOutputStream imageBaos = new ByteArrayOutputStream();
+                        ImageIO.write(bim, format, imageBaos);
 
-                ByteArrayOutputStream imageBaos = new ByteArrayOutputStream();
-                ImageIO.write(bim, format, imageBaos);
-
-                ZipEntry zipEntry = new ZipEntry("page_" + (page + 1) + "." + format);
-                zos.putNextEntry(zipEntry);
-                zos.write(imageBaos.toByteArray());
-                zos.closeEntry();
+                        ZipEntry zipEntry = new ZipEntry("file_" + fileNum + "_page_" + (page + 1) + "." + format);
+                        zos.putNextEntry(zipEntry);
+                        zos.write(imageBaos.toByteArray());
+                        zos.closeEntry();
+                    }
+                }
+                fileNum++;
             }
         }
         return zipBaos.toByteArray();

@@ -19,42 +19,45 @@ import java.util.zip.ZipOutputStream;
 public class PdfSplitServiceImpl implements PdfSplitService {
 
     @Override
-    public byte[] splitPdf(InputStream file, String ranges) throws IOException {
-        byte[] fileBytes = file.readAllBytes();
-
-        if (ranges == null || ranges.trim().isEmpty()) {
-            return splitToZip(fileBytes);
-        } else {
-            return extractPages(fileBytes, ranges);
-        }
-    }
-
-    private byte[] splitToZip(byte[] fileBytes) throws IOException {
-        PDDocument document = Loader.loadPDF(fileBytes);
-        Splitter splitter = new Splitter();
-        List<PDDocument> splitPages = splitter.split(document);
-        document.close();
-
+    public byte[] splitPdfs(List<InputStream> files, String ranges) throws IOException {
         try (ByteArrayOutputStream zipStream = new ByteArrayOutputStream();
              ZipOutputStream zos = new ZipOutputStream(zipStream)) {
-            int pageNum = 1;
-            for (PDDocument pageDoc : splitPages) {
-                try (ByteArrayOutputStream pageOut = new ByteArrayOutputStream()) {
-                    pageDoc.save(pageOut);
-                    ZipEntry zipEntry = new ZipEntry("page_" + pageNum++ + ".pdf");
-                    zos.putNextEntry(zipEntry);
-                    zos.write(pageOut.toByteArray());
-                    zos.closeEntry();
-                } finally {
-                    pageDoc.close();
+            int fileNum = 1;
+            for (InputStream file : files) {
+                byte[] fileBytes = file.readAllBytes();
+                if (ranges == null || ranges.trim().isEmpty()) {
+                    splitToZip(zos, fileBytes, fileNum);
+                } else {
+                    extractPagesToZip(zos, fileBytes, ranges, fileNum);
                 }
+                fileNum++;
             }
             zos.finish();
             return zipStream.toByteArray();
         }
     }
 
-    private byte[] extractPages(byte[] fileBytes, String ranges) throws IOException {
+    private void splitToZip(ZipOutputStream zos, byte[] fileBytes, int fileNum) throws IOException {
+        PDDocument document = Loader.loadPDF(fileBytes);
+        Splitter splitter = new Splitter();
+        List<PDDocument> splitPages = splitter.split(document);
+        document.close();
+
+        int pageNum = 1;
+        for (PDDocument pageDoc : splitPages) {
+            try (ByteArrayOutputStream pageOut = new ByteArrayOutputStream()) {
+                pageDoc.save(pageOut);
+                ZipEntry zipEntry = new ZipEntry("file_" + fileNum + "_page_" + pageNum++ + ".pdf");
+                zos.putNextEntry(zipEntry);
+                zos.write(pageOut.toByteArray());
+                zos.closeEntry();
+            } finally {
+                pageDoc.close();
+            }
+        }
+    }
+
+    private void extractPagesToZip(ZipOutputStream zos, byte[] fileBytes, String ranges, int fileNum) throws IOException {
         Set<Integer> pageNumbers = parseRanges(ranges);
         try (PDDocument document = Loader.loadPDF(fileBytes);
              PDDocument newDocument = new PDDocument()) {
@@ -65,7 +68,11 @@ public class PdfSplitServiceImpl implements PdfSplitService {
             }
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             newDocument.save(outputStream);
-            return outputStream.toByteArray();
+
+            ZipEntry zipEntry = new ZipEntry("file_" + fileNum + "_extracted.pdf");
+            zos.putNextEntry(zipEntry);
+            zos.write(outputStream.toByteArray());
+            zos.closeEntry();
         }
     }
 

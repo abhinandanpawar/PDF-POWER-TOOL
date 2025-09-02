@@ -7,14 +7,32 @@ import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 @Service
 public class PdfPageDeletionServiceImpl implements PdfPageDeletionService {
 
     @Override
-    public byte[] deletePages(byte[] pdfBytes, List<Integer> pagesToDelete) throws IOException {
+    public byte[] deletePages(List<InputStream> files, List<Integer> pagesToDelete) throws IOException {
+        ByteArrayOutputStream zipStream = new ByteArrayOutputStream();
+        try (ZipOutputStream zos = new ZipOutputStream(zipStream)) {
+            int fileNumber = 1;
+            for (InputStream file : files) {
+                byte[] modifiedPdf = deletePagesInSinglePdf(file.readAllBytes(), pagesToDelete);
+                ZipEntry zipEntry = new ZipEntry("modified_" + fileNumber++ + ".pdf");
+                zos.putNextEntry(zipEntry);
+                zos.write(modifiedPdf);
+                zos.closeEntry();
+            }
+        }
+        return zipStream.toByteArray();
+    }
+
+    private byte[] deletePagesInSinglePdf(byte[] pdfBytes, List<Integer> pagesToDelete) throws IOException {
         if (pagesToDelete == null || pagesToDelete.isEmpty()) {
             return pdfBytes; // Return original if no pages are specified for deletion
         }

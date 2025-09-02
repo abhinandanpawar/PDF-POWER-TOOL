@@ -8,13 +8,31 @@ import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 @Service
 public class PdfRotationServiceImpl implements PdfRotationService {
 
     @Override
-    public byte[] rotatePages(byte[] pdfBytes, List<Integer> pagesToRotate, int rotationDegrees) throws IOException {
+    public byte[] rotatePages(List<InputStream> files, List<Integer> pagesToRotate, int rotationDegrees) throws IOException {
+        ByteArrayOutputStream zipStream = new ByteArrayOutputStream();
+        try (ZipOutputStream zos = new ZipOutputStream(zipStream)) {
+            int fileNumber = 1;
+            for (InputStream file : files) {
+                byte[] rotatedPdf = rotatePagesInSinglePdf(file.readAllBytes(), pagesToRotate, rotationDegrees);
+                ZipEntry zipEntry = new ZipEntry("rotated_" + fileNumber++ + ".pdf");
+                zos.putNextEntry(zipEntry);
+                zos.write(rotatedPdf);
+                zos.closeEntry();
+            }
+        }
+        return zipStream.toByteArray();
+    }
+
+    private byte[] rotatePagesInSinglePdf(byte[] pdfBytes, List<Integer> pagesToRotate, int rotationDegrees) throws IOException {
         if (rotationDegrees % 90 != 0) {
             throw new IllegalArgumentException("Rotation must be a multiple of 90.");
         }

@@ -53,7 +53,7 @@ public class TextExtractionControllerIntegrationTest {
         byte[] pdfContent = createPdfWithText(testText);
 
         MockMultipartFile file = new MockMultipartFile(
-                "file",
+                "files",
                 "text-test.pdf",
                 MediaType.APPLICATION_PDF_VALUE,
                 pdfContent

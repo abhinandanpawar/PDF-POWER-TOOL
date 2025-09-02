@@ -14,12 +14,31 @@ import org.springframework.stereotype.Service;
 import java.awt.Color;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 @Service
 public class PdfAnnotationServiceImpl implements PdfAnnotationService {
 
     @Override
-    public byte[] addWatermark(byte[] pdfBytes, String watermarkText) throws IOException {
+    public byte[] addWatermarks(List<InputStream> files, String watermarkText) throws IOException {
+        ByteArrayOutputStream zipStream = new ByteArrayOutputStream();
+        try (ZipOutputStream zos = new ZipOutputStream(zipStream)) {
+            int fileNumber = 1;
+            for (InputStream file : files) {
+                byte[] watermarkedPdf = addWatermarkToSinglePdf(file.readAllBytes(), watermarkText);
+                ZipEntry zipEntry = new ZipEntry("watermarked_" + fileNumber++ + ".pdf");
+                zos.putNextEntry(zipEntry);
+                zos.write(watermarkedPdf);
+                zos.closeEntry();
+            }
+        }
+        return zipStream.toByteArray();
+    }
+
+    private byte[] addWatermarkToSinglePdf(byte[] pdfBytes, String watermarkText) throws IOException {
         try (PDDocument document = Loader.loadPDF(pdfBytes)) {
             for (PDPage page : document.getPages()) {
                 try (PDPageContentStream cs = new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND, true, true)) {
