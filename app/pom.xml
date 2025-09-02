@@ -56,6 +56,18 @@
             <groupId>com.example</groupId>
             <artifactId>pdf-to-image</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.example</groupId>
+            <artifactId>pdf-rotate</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.example</groupId>
+            <artifactId>pdf-reorder</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.example</groupId>
+            <artifactId>pdf-metadata</artifactId>
+        </dependency>
 
         <!-- Spring Boot -->
         <dependency>
