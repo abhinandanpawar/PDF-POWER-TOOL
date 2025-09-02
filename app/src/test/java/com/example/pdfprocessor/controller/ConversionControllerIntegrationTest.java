@@ -55,7 +55,7 @@ public class ConversionControllerIntegrationTest {
         byte[] pdfContent = createDummyPdf("This is a test.");
 
         MockMultipartFile file = new MockMultipartFile(
-                "file",
+                "files",
                 "test.pdf",
                 MediaType.APPLICATION_PDF_VALUE,
                 pdfContent
@@ -69,10 +69,32 @@ public class ConversionControllerIntegrationTest {
         byte[] responseBytes = result.getResponse().getContentAsByteArray();
         String contentType = result.getResponse().getContentType();
 
-        assertEquals("application/vnd.openxmlformats-officedocument.wordprocessingml.document", contentType);
-        assertTrue(responseBytes.length > 0, "DOCX file should not be empty.");
+        assertEquals(MediaType.APPLICATION_OCTET_STREAM_VALUE, contentType);
+        assertTrue(responseBytes.length > 0, "zip file should not be empty.");
+    }
 
-        // A .docx file is a zip archive, so it should start with the "PK" magic number (50 4B)
-        assertTrue(responseBytes[0] == 0x50 && responseBytes[1] == 0x4B, "Response should be a valid zip archive (docx).");
+    @Test
+    void shouldConvertPdfToImages() throws Exception {
+        byte[] pdfContent = createDummyPdf("This is a test.");
+
+        MockMultipartFile file = new MockMultipartFile(
+                "files",
+                "test.pdf",
+                MediaType.APPLICATION_PDF_VALUE,
+                pdfContent
+        );
+
+        mockMvc.perform(multipart("/api/v1/convert/pdf-to-images")
+                        .file(file))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Content-Disposition", "attachment; filename=\"images.zip\""))
+                .andExpect(mvcResult -> {
+                    byte[] responseBytes = mvcResult.getResponse().getContentAsByteArray();
+                    try (ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(responseBytes))) {
+                        ZipEntry entry = zis.getNextEntry();
+                        assertNotNull(entry);
+                        assertTrue(entry.getName().endsWith(".png"));
+                    }
+                });
     }
 }

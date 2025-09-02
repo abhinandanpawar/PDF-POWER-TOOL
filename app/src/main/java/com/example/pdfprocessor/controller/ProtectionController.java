@@ -9,6 +9,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/pdfs")
@@ -21,15 +24,22 @@ public class ProtectionController {
     }
 
     @PostMapping("/protect")
-    public ResponseEntity<byte[]> protectPdf(
-            @RequestParam("file") MultipartFile file,
+    public ResponseEntity<byte[]> protectPdfs(
+            @RequestParam("files") List<MultipartFile> files,
             @RequestParam("password") String password) {
         try {
-            byte[] protectedPdf = pdfProtectionService.protectPdf(file.getBytes(), password);
+            List<InputStream> fileStreams = files.stream().map(file -> {
+                try {
+                    return file.getInputStream();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }).collect(Collectors.toList());
+            byte[] protectedPdf = pdfProtectionService.protectPdfs(fileStreams, password);
 
             HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_PDF);
-            headers.setContentDispositionFormData("attachment", "protected_" + file.getOriginalFilename());
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            headers.setContentDispositionFormData("attachment", "protected.zip");
 
             return new ResponseEntity<>(protectedPdf, headers, HttpStatus.OK);
         } catch (IOException e) {

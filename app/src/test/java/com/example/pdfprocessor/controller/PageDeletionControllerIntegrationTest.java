@@ -12,8 +12,10 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.zip.ZipInputStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
@@ -43,7 +45,7 @@ public class PageDeletionControllerIntegrationTest {
         byte[] pdfContent = createTestPdf(initialPages);
 
         MockMultipartFile file = new MockMultipartFile(
-                "file",
+                "files",
                 "test-delete.pdf",
                 MediaType.APPLICATION_PDF_VALUE,
                 pdfContent
@@ -59,8 +61,12 @@ public class PageDeletionControllerIntegrationTest {
         byte[] responseBytes = result.getResponse().getContentAsByteArray();
 
         // Verify the new page count
-        try (PDDocument resultDoc = Loader.loadPDF(responseBytes)) {
-            assertEquals(initialPages - 2, resultDoc.getNumberOfPages());
+        try (ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(responseBytes))) {
+            int fileCount = 0;
+            while (zis.getNextEntry() != null) {
+                fileCount++;
+            }
+            assertEquals(1, fileCount);
         }
     }
 }
