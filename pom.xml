@@ -32,6 +32,7 @@
         <module>pdf-convert</module>
         <module>pdf-protect</module>
         <module>pdf-annotate</module>
+        <module>pdf-text-extraction</module>
     </modules>
 
     <dependencyManagement>
@@ -70,6 +71,11 @@
             <dependency>
                 <groupId>com.example</groupId>
                 <artifactId>pdf-annotate</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.example</groupId>
+                <artifactId>pdf-text-extraction</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

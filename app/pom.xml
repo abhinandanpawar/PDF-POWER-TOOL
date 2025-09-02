@@ -44,6 +44,10 @@
             <groupId>com.example</groupId>
             <artifactId>pdf-annotate</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.example</groupId>
+            <artifactId>pdf-text-extraction</artifactId>
+        </dependency>
 
         <!-- Spring Boot -->
         <dependency>
