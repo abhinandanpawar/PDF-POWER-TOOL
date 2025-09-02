@@ -162,6 +162,7 @@ This document provides detailed information about the API endpoints for the PDF 
   - **Content-Type:** `text/plain`
   - **Body:** A string containing the extracted text from all the files.
 
+
 ### Reorder Controller (`/api/v1/pdfs`)
 
 #### Reorder Pages
@@ -177,3 +178,4 @@ This document provides detailed information about the API endpoints for the PDF 
 - **Response:**
   - **Content-Type:** `application/octet-stream`
   - **Body:** A ZIP file containing the reordered PDF documents.
+
