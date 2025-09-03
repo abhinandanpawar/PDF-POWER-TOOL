@@ -42,6 +42,7 @@
         <module>image-convert</module>
         <module>markdown-convert</module>
         <module>ppt-convert</module>
+        <module>spreadsheet-convert</module>
     </modules>
 
     <dependencyManagement>
@@ -130,6 +131,11 @@
             <dependency>
                 <groupId>com.example</groupId>
                 <artifactId>ppt-convert</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.example</groupId>
+                <artifactId>spreadsheet-convert</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

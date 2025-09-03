@@ -9,6 +9,8 @@ export enum Tool {
   ImageConvert = 'image-convert',
   MarkdownConvert = 'markdown-convert',
   PptConvert = 'ppt-convert',
+  SpreadsheetConvert = 'spreadsheet-convert',
+  CsvXlsxConvert = 'csv-xlsx-convert',
   PdfToImages = 'pdf-to-images',
   DeletePages = 'delete-pages',
   Protect = 'protect',
