@@ -1,0 +1,5 @@
+{
+  "name": "PDF Power Toolbox",
+  "description": "A comprehensive web-based application to manipulate and convert PDF files. Provides a suite of tools including merging, splitting, compressing, watermarking, and converting PDFs to various formats.",
+  "requestFramePermissions": []
+}

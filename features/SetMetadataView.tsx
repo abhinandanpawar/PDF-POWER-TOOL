@@ -1,0 +1,113 @@
+import React, { useState } from 'react';
+import ToolPageLayout from '../components/ToolPageLayout';
+import FileUpload from '../components/FileUpload';
+import { setPdfMetadata } from '../services/apiService';
+import { useToasts } from '../hooks/useToasts';
+import { useLoading } from '../hooks/useLoading';
+
+interface MetadataField {
+  id: number;
+  key: string;
+  value: string;
+}
+
+const SetMetadataView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
+  const [files, setFiles] = useState<File[]>([]);
+  const [metadataFields, setMetadataFields] = useState<MetadataField[]>([{ id: Date.now(), key: '', value: '' }]);
+  const { addToast } = useToasts();
+  const { showLoading, hideLoading } = useLoading();
+
+  const handleFieldChange = (id: number, field: 'key' | 'value', value: string) => {
+    setMetadataFields(fields => fields.map(f => f.id === id ? { ...f, [field]: value } : f));
+  };
+
+  const addField = () => {
+    setMetadataFields(fields => [...fields, { id: Date.now(), key: '', value: '' }]);
+  };
+
+  const removeField = (id: number) => {
+    setMetadataFields(fields => fields.filter(f => f.id !== id));
+  };
+
+  const handleSetMetadata = async () => {
+    if (files.length !== 1) {
+      addToast('error', 'Please select exactly one PDF file.');
+      return;
+    }
+    const metadata = metadataFields.reduce((acc, field) => {
+        if(field.key.trim()) {
+            acc[field.key.trim()] = field.value.trim();
+        }
+        return acc;
+    }, {} as {[key: string]: string});
+
+    if (Object.keys(metadata).length === 0) {
+        addToast('error', 'Please provide at least one valid metadata key-value pair.');
+        return;
+    }
+    
+    showLoading();
+    try {
+      await setPdfMetadata(files[0], metadata);
+      setFiles([]);
+      setMetadataFields([{ id: Date.now(), key: '', value: '' }]);
+      addToast('success', 'Metadata set successfully! Your download has started.');
+    } catch (e) {
+      addToast('error', (e as Error).message);
+    } finally {
+      hideLoading();
+    }
+  };
+
+  return (
+    <ToolPageLayout
+      title="Set PDF Metadata"
+      description="Update or add metadata properties such as Title, Author, or Keywords to a PDF file."
+      onBack={onBack}
+    >
+      <div className="space-y-6">
+        <FileUpload files={files} setFiles={setFiles} multiple={false} />
+        <div>
+          <h3 className="text-lg font-semibold mb-2 text-text-secondary">Metadata Fields</h3>
+          <div className="space-y-3">
+            {metadataFields.map((field) => (
+              <div key={field.id} className="flex items-center gap-2">
+                <input
+                  type="text"
+                  placeholder="Key (e.g., Title)"
+                  value={field.key}
+                  onChange={(e) => handleFieldChange(field.id, 'key', e.target.value)}
+                  className="flex-1 bg-secondary border border-border rounded-lg p-2 text-text-primary focus:ring-primary focus:border-primary"
+                />
+                <input
+                  type="text"
+                  placeholder="Value"
+                  value={field.value}
+                  onChange={(e) => handleFieldChange(field.id, 'value', e.target.value)}
+                  className="flex-1 bg-secondary border border-border rounded-lg p-2 text-text-primary focus:ring-primary focus:border-primary"
+                />
+                {metadataFields.length > 1 && (
+                  <button onClick={() => removeField(field.id)} className="text-red-500 hover:text-red-400 p-2 rounded-full bg-secondary" aria-label="Remove field">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+          <button onClick={addField} className="mt-3 text-sm text-primary hover:underline">
+            + Add another field
+          </button>
+        </div>
+        <button
+          onClick={handleSetMetadata}
+          disabled={files.length === 0}
+          className="w-full bg-primary text-white font-bold py-3 px-4 rounded-lg hover:bg-primary-hover disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors"
+        >
+          Set Metadata and Download
+        </button>
+      </div>
+    </ToolPageLayout>
+  );
+};
+
+export default SetMetadataView;
