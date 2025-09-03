@@ -38,8 +38,6 @@
         <module>pdf-rotate</module>
         <module>pdf-reorder</module>
         <module>pdf-metadata</module>
-        <module>doc-convert</module>
-        <module>image-convert</module>
         <module>markdown-convert</module>
         <module>ppt-convert</module>
         <module>spreadsheet-convert</module>
@@ -115,16 +113,6 @@
             </dependency>
             <dependency>
                 <groupId>com.example</groupId>
-                <artifactId>doc-convert</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.example</groupId>
-                <artifactId>image-convert</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.example</groupId>
                 <artifactId>markdown-convert</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -138,7 +126,6 @@
                 <artifactId>spreadsheet-convert</artifactId>
                 <version>${project.version}</version>
             </dependency>
-
             <!-- External Libraries -->
             <dependency>
                 <groupId>org.apache.pdfbox</groupId>

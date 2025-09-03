@@ -6,7 +6,6 @@ export enum Tool {
   PdfToWord = 'pdf-to-word',
   DocToPdf = 'doc-to-pdf',
   DocToTxt = 'doc-to-txt',
-  ImageConvert = 'image-convert',
   MarkdownConvert = 'markdown-convert',
   PptConvert = 'ppt-convert',
   SpreadsheetConvert = 'spreadsheet-convert',
