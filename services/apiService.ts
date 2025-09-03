@@ -152,6 +152,62 @@ export const convertPpt = async (file: File, format: 'pdf' | 'images') => {
     await processFileResponse(response, outputFilename);
 };
 
+export const convertSpreadsheet = async (file: File, format: 'pdf' | 'html') => {
+    const formData = new FormData();
+    formData.append('file', file);
+    const endpoint = `${BASE_URL}/spreadsheet-convert/xls-to-${format}`;
+    const response = await fetch(endpoint, { method: 'POST', body: formData });
+    await handleApiResponse(response);
+
+    let outputFilename = `converted.${format}`;
+    if (file.name) {
+        const dotIndex = file.name.lastIndexOf('.');
+        if (dotIndex > 0) {
+            outputFilename = file.name.substring(0, dotIndex) + `.${format}`;
+        }
+    }
+
+    if (format === 'html') {
+        const html = await response.text();
+        const blob = new Blob([html], { type: 'text/html' });
+        downloadFile(blob, outputFilename);
+    } else {
+        const blob = await response.blob();
+        downloadFile(blob, outputFilename);
+    }
+};
+
+export const convertCsvXlsx = async (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const isCsv = file.name.toLowerCase().endsWith('.csv');
+    const endpoint = isCsv
+        ? `${BASE_URL}/spreadsheet-convert/csv-to-xlsx`
+        : `${BASE_URL}/spreadsheet-convert/xlsx-to-csv`;
+
+    const response = await fetch(endpoint, { method: 'POST', body: formData });
+    await handleApiResponse(response);
+
+    const outputExtension = isCsv ? 'xlsx' : 'csv';
+    let outputFilename = `converted.${outputExtension}`;
+    if (file.name) {
+        const dotIndex = file.name.lastIndexOf('.');
+        if (dotIndex > 0) {
+            outputFilename = file.name.substring(0, dotIndex) + `.${outputExtension}`;
+        }
+    }
+
+    if (isCsv) {
+        const blob = await response.blob();
+        downloadFile(blob, outputFilename);
+    } else {
+        const text = await response.text();
+        const blob = new Blob([text], { type: 'text/csv' });
+        downloadFile(blob, outputFilename);
+    }
+};
+
 export const convertPdfToImages = async (files: File[], format: string, dpi: number) => {
     const formData = new FormData();
     files.forEach(file => formData.append('files', file));
