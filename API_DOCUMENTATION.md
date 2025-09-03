@@ -179,3 +179,31 @@ This document provides detailed information about the API endpoints for the PDF 
   - **Content-Type:** `application/octet-stream`
   - **Body:** A ZIP file containing the reordered PDF documents.
 
+### Metadata Controller (`/api/v1/metadata`)
+
+#### Get PDF Metadata
+
+- **URL:** `/get`
+- **Method:** `POST`
+- **Description:** Retrieves the metadata from a PDF file.
+- **Request:**
+  - **Content-Type:** `multipart/form-data`
+  - **Body:**
+    - `file`: The PDF file from which to extract metadata.
+- **Response:**
+  - **Content-Type:** `application/json`
+  - **Body:** A JSON object containing the PDF metadata.
+
+#### Set PDF Metadata
+
+- **URL:** `/set`
+- **Method:** `POST`
+- **Description:** Sets the metadata for a PDF file.
+- **Request:**
+  - **Content-Type:** `multipart/form-data`
+  - **Body:**
+    - `file`: The PDF file to modify.
+    - `metadata`: A map of key-value pairs representing the metadata to set.
+- **Response:**
+  - **Content-Type:** `application/pdf`
+  - **Body:** The PDF document with the updated metadata.
