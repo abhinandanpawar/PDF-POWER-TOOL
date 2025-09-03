@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,8 +27,9 @@ public class ReorderController {
     @PostMapping("/reorder-pages")
     public ResponseEntity<byte[]> reorderPages(
             @RequestParam("files") List<MultipartFile> files,
-            @RequestParam("order") List<Integer> order) {
+            @RequestParam("order") String orderStr) {
         try {
+            List<Integer> order = parseOrderString(orderStr);
             List<InputStream> fileStreams = files.stream().map(file -> {
                 try {
                     return file.getInputStream();
@@ -48,5 +50,38 @@ public class ReorderController {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    private List<Integer> parseOrderString(String orderStr) {
+        List<Integer> order = new ArrayList<>();
+        if (orderStr != null && !orderStr.isEmpty()) {
+            String[] parts = orderStr.split(",");
+            for (String part : parts) {
+                part = part.trim();
+                if (part.contains("-")) {
+                    String[] range = part.split("-");
+                    if (range.length == 2) {
+                        try {
+                            int start = Integer.parseInt(range[0]);
+                            int end = Integer.parseInt(range[1]);
+                            if (start <= end) {
+                                for (int i = start; i <= end; i++) {
+                                    order.add(i);
+                                }
+                            }
+                        } catch (NumberFormatException e) {
+                            // ignore invalid range
+                        }
+                    }
+                } else {
+                    try {
+                        order.add(Integer.parseInt(part));
+                    } catch (NumberFormatException e) {
+                        // ignore invalid number
+                    }
+                }
+            }
+        }
+        return order;
     }
 }

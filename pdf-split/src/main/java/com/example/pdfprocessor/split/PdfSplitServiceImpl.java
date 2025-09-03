@@ -58,16 +58,21 @@ public class PdfSplitServiceImpl implements PdfSplitService {
     }
 
     private void extractPagesToZip(ZipOutputStream zos, byte[] fileBytes, String ranges, int fileNum) throws IOException {
+        System.out.println("Extracting pages for file " + fileNum + " with ranges: " + ranges);
         Set<Integer> pageNumbers = parseRanges(ranges);
+        System.out.println("Parsed page numbers: " + pageNumbers);
         try (PDDocument document = Loader.loadPDF(fileBytes);
              PDDocument newDocument = new PDDocument()) {
+            System.out.println("Total pages in document: " + document.getNumberOfPages());
             for (int pageNum : pageNumbers) {
+                System.out.println("Adding page " + pageNum);
                 if (pageNum > 0 && pageNum <= document.getNumberOfPages()) {
                     newDocument.addPage(document.getPage(pageNum - 1));
                 }
             }
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             newDocument.save(outputStream);
+            System.out.println("New document has " + newDocument.getNumberOfPages() + " pages.");
 
             ZipEntry zipEntry = new ZipEntry("file_" + fileNum + "_extracted.pdf");
             zos.putNextEntry(zipEntry);
@@ -77,6 +82,7 @@ public class PdfSplitServiceImpl implements PdfSplitService {
     }
 
     private Set<Integer> parseRanges(String ranges) {
+        System.out.println("Parsing ranges: " + ranges);
         Set<Integer> pageNumbers = new HashSet<>();
         String[] parts = ranges.split(",");
         for (String part : parts) {
@@ -85,6 +91,7 @@ public class PdfSplitServiceImpl implements PdfSplitService {
                 String[] range = part.split("-");
                 int start = Integer.parseInt(range[0]);
                 int end = Integer.parseInt(range[1]);
+                System.out.println("Range: start=" + start + ", end=" + end);
                 for (int i = start; i <= end; i++) {
                     pageNumbers.add(i);
                 }

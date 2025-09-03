@@ -1,6 +1,7 @@
 package com.example.pdfprocessor.merge;
 
 import com.example.pdfprocessor.api.PdfMergeService;
+import org.apache.pdfbox.io.IOUtils;
 import org.apache.pdfbox.io.RandomAccessReadBuffer;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.springframework.stereotype.Service;
@@ -22,7 +23,7 @@ public class PdfMergeServiceImpl implements PdfMergeService {
         for (InputStream file : files) {
             pdfMerger.addSource(new RandomAccessReadBuffer(file));
         }
-        pdfMerger.mergeDocuments(null);
+        pdfMerger.mergeDocuments(IOUtils.createMemoryOnlyStreamCache());
 
         return outputStream.toByteArray();
     }
