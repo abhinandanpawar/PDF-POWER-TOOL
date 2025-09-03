@@ -19,6 +19,7 @@ export enum Tool {
   ReorderPages = 'reorder-pages',
   GetMetadata = 'get-metadata',
   SetMetadata = 'set-metadata',
+  CadConvert = 'cad-convert',
 }
 
 export enum ToolCategory {
