@@ -37,6 +37,7 @@ import ConfigConverterView from './features/ConfigConverterView';
 import NotepadView from './features/NotepadView';
 import ReloadPrompt from './components/ReloadPrompt';
 import PasswordGeneratorView from './features/PasswordGeneratorView';
+import FileExporterView from './features/FileExporterView';
 
 const App: React.FC = () => {
   const [activeTool, setActiveTool] = useState<Tool | null>(null);
@@ -74,6 +75,7 @@ const App: React.FC = () => {
       case Tool.AudioConvert: return <AudioConvertView onBack={handleGoBack} />;
       case Tool.VideoConvert: return <VideoConvertView onBack={handleGoBack} />;
       case Tool.PdfToImages: return <PdfToImagesView onBack={handleGoBack} />;
+      case Tool.FileExporter: return <FileExporterView onBack={handleGoBack} />;
       case Tool.DeletePages: return <DeletePagesView onBack={handleGoBack} />;
       case Tool.Protect: return <ProtectView onBack={handleGoBack} />;
       case Tool.RotatePages: return <RotatePagesView onBack={handleGoBack} />;

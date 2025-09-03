@@ -13,6 +13,7 @@ export enum Tool {
   AudioConvert = 'audio-convert',
   VideoConvert = 'video-convert',
   PdfToImages = 'pdf-to-images',
+  FileExporter = 'file-exporter',
   DeletePages = 'delete-pages',
   Protect = 'protect',
   RotatePages = 'rotate-pages',
