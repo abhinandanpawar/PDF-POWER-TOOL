@@ -41,7 +41,12 @@
         <module>markdown-convert</module>
         <module>ppt-convert</module>
         <module>spreadsheet-convert</module>
+
+        <module>font-converter</module>
+        <module>syntax-highlighter</module>
+
         <module>multimedia-convert</module>
+
     </modules>
 
     <dependencyManagement>
