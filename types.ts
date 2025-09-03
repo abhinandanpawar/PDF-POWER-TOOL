@@ -11,6 +11,8 @@ export enum Tool {
   PptConvert = 'ppt-convert',
   SpreadsheetConvert = 'spreadsheet-convert',
   CsvXlsxConvert = 'csv-xlsx-convert',
+  AudioConvert = 'audio-convert',
+  VideoConvert = 'video-convert',
   PdfToImages = 'pdf-to-images',
   DeletePages = 'delete-pages',
   Protect = 'protect',
