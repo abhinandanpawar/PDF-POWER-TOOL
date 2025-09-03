@@ -1,6 +1,6 @@
 import React from 'react';
 import { Tool, ToolInfo, ToolCategory } from './types';
-import { GitCompareArrows, Braces, Sparkles, FileCog } from 'lucide-react';
+import { GitCompareArrows, Braces, Sparkles, FileCog, Notebook, KeyRound, FileDown } from 'lucide-react';
 
 // Icon components
 const MergeIcon = () => (<svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 9.75h16.5m-16.5 4.5h16.5m-16.5 4.5h16.5M3.75 6.75h16.5" /></svg>);
@@ -43,6 +43,7 @@ export const TOOLS: ToolInfo[] = [
   { key: Tool.AudioConvert, title: 'Audio Converter', description: 'Convert audio files (WAV, MP3, AAC, etc.).', icon: <AudioConvertIcon />, category: ToolCategory.Convert },
   { key: Tool.VideoConvert, title: 'Video Converter', description: 'Convert video files (MP4, WEBM, GIF, etc.).', icon: <VideoConvertIcon />, category: ToolCategory.Convert },
   { key: Tool.PdfToImages, title: 'PDF to Images', description: 'Convert PDF pages to images (PNG/JPG).', icon: <PdfToImagesIcon />, category: ToolCategory.Convert },
+  { key: Tool.FileExporter, title: 'Text to File', description: 'Save raw text to a file with any extension.', icon: <FileDown />, category: ToolCategory.Convert },
   { key: Tool.ExtractText, title: 'Extract Text', description: 'Pull all text content from a PDF.', icon: <ExtractTextIcon />, category: ToolCategory.Convert },
   { key: Tool.CadConvert, title: 'CAD to PDF', description: 'Convert DXF files to PDF.', icon: <CadConvertIcon />, category: ToolCategory.Convert },
 
@@ -60,4 +61,6 @@ export const TOOLS: ToolInfo[] = [
   { key: Tool.JsonFormat, title: 'JSON Formatter', description: 'Format or minify your JSON data.', icon: <Braces />, category: ToolCategory.Developer },
   { key: Tool.DataClean, title: 'Data Cleaner', description: 'Clean and transform your text data.', icon: <Sparkles />, category: ToolCategory.Developer },
   { key: Tool.ConfigConvert, title: 'Config Converter', description: 'Convert between different config file formats.', icon: <FileCog />, category: ToolCategory.Developer },
+  { key: Tool.Notepad, title: 'Offline Notepad', description: 'A multi-tab code editor that saves automatically.', icon: <Notebook />, category: ToolCategory.Developer },
+  { key: Tool.PasswordGenerator, title: 'Password Generator', description: 'Create strong, random passwords and check their strength.', icon: <KeyRound />, category: ToolCategory.Developer },
 ];
