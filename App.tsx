@@ -16,6 +16,8 @@ import DocToTxtView from './features/DocToTxtView';
 import ImageConvertView from './features/ImageConvertView';
 import MarkdownConvertView from './features/MarkdownConvertView';
 import PptConvertView from './features/PptConvertView';
+import SpreadsheetConvertView from './features/SpreadsheetConvertView';
+import CsvXlsxView from './features/CsvXlsxView';
 import PdfToImagesView from './features/PdfToImagesView';
 import DeletePagesView from './features/DeletePagesView';
 import ProtectView from './features/ProtectView';
@@ -57,6 +59,8 @@ const App: React.FC = () => {
       case Tool.ImageConvert: return <ImageConvertView onBack={handleGoBack} />;
       case Tool.MarkdownConvert: return <MarkdownConvertView onBack={handleGoBack} />;
       case Tool.PptConvert: return <PptConvertView onBack={handleGoBack} />;
+      case Tool.SpreadsheetConvert: return <SpreadsheetConvertView onBack={handleGoBack} />;
+      case Tool.CsvXlsxConvert: return <CsvXlsxView onBack={handleGoBack} />;
       case Tool.PdfToImages: return <PdfToImagesView onBack={handleGoBack} />;
       case Tool.DeletePages: return <DeletePagesView onBack={handleGoBack} />;
       case Tool.Protect: return <ProtectView onBack={handleGoBack} />;

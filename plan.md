@@ -1,58 +1,59 @@
-# Project Plan
+# Project Plan & Task Assignments
 
-This document outlines the development plan for this project, broken down into phased feature implementations.
+This document outlines the development plan and the breakdown of tasks for parallel execution by multiple Jules agents.
 
-## Main Features Roadmap
+## Task Assignments
 
-1.  **Phase 1: Core Document & Image Conversions.** (Completed) This initial phase covers the most frequent user needs, focusing on everyday document and image formats.
-    - *Document Conversions:* PDF to DOCX/TXT, DOC/DOCX to PDF/TXT.
-    - *Image Conversions:* JPG, PNG, WEBP, HEIC interchange.
+The project is broken down into the following independent tasks that can be assigned to different agents.
 
-2.  **Phase 2: Advanced Documents, Presentations & Spreadsheets.** (In Progress) This phase broadens our support for office-suite documents.
-    - *Advanced Documents:* Markdown to HTML/PDF. (Completed)
-    - *Presentations:* PPT/PPTX to PDF/Images. (Completed)
-    - *Spreadsheets:* XLS/XLSX/CSV to PDF/HTML & interchange. (Current Task)
+*   **Task 1 (Agent: Jules, Current Assignee):** Core Conversions
+    *   **Goal:** Complete the core document, presentation, audio, and video conversion features.
+    *   **Scope:**
+        *   Finish Phase 2: Spreadsheet Conversions.
+        *   Complete Phase 3: Audio & Video Conversions.
 
-3.  **Phase 3: Audio & Video Conversions.** This phase will introduce multimedia conversion capabilities.
-    - *Audio:* WAV, MP3, AAC, FLAC, OGG conversions.
-    - *Video:* MP4, MOV, MKV, AVI, WMV conversions to modern formats.
+*   **Task 2 (Agent: Unassigned):** E-Books & Archives
+    *   **Goal:** Implement e-book and archive format conversions.
+    *   **Scope:** Phase 4.
 
-4.  **Phase 4: E-Books & Archives.** This phase will cater to users who work with digital books and compressed files.
-    - *E-Books:* EPUB, MOBI, AZW interchange.
-    - *Archives:* ZIP, RAR, 7Z, TAR.GZ interchange.
+*   **Task 3 (Agent: Unassigned):** Developer & Designer Tools
+    *   **Goal:** Implement syntax highlighting and font conversion tools.
+    *   **Scope:** Phase 5.
 
-5.  **Phase 5: Developer & Designer Tools.** This phase will add features specifically for developers, designers, and technical users.
-    - *Code & Markup:* Syntax-highlighted conversion, JSON/YAML/CSV utilities.
-    - *Fonts:* TTF/OTF to WOFF/WOFF2 conversion.
+*   **Task 4 (Agent: Unassigned):** Specialized & Professional Formats
+    *   **Goal:** Implement support for CAD, GIS, and database formats.
+    *   **Scope:** Phase 6.
 
-6.  **Phase 6: Specialized Professional Formats.** This phase will tackle industry-specific formats.
-    - *CAD/3D:* DWG, DXF, STL, OBJ conversions.
-    - *GIS:* SHP, GeoJSON, KML conversions.
-    - *Databases:* SQLite and other DB dump conversions.
-
-7.  **Documentation.** For each phase, create comprehensive documentation.
+*   **Task 5 (Agent: Unassigned):** Advanced Developer Utilities (Client-Side)
+    *   **Goal:** Build the suite of client-side JavaScript developer tools.
+    *   **Scope:** Phases A, B, and C from the "Developer Utilities" roadmap.
 
 ---
 
-## Future Implementation Roadmap: Advanced Conversions
+## Detailed Feature Phases (Reference for Tasks)
 
-This section outlines more advanced and specialized file format conversions to be tackled after the main roadmap.
+### Main Roadmap
+*   **Phase 1: Core Document & Image Conversions.** (Completed by Jules)
+*   **Phase 2: Advanced Documents, Presentations & Spreadsheets.** (In Progress by Jules, assigned to Task 1)
+*   **Phase 3: Audio & Video Conversions.** (Assigned to Task 1)
+*   **Phase 4: E-Books & Archives.** (Assigned to Task 2)
+*   **Phase 5: Developer & Designer Tools.** (Assigned to Task 3)
+*   **Phase 6: Specialized Professional Formats.** (Assigned to Task 4)
+*   **Phase 7: Documentation.** (Ongoing for all tasks)
 
-*   **Phase 8: Advanced Documents & E-Books:** Professional publishing (InDesign, Visio), additional e-book formats (FB2, LIT).
-*   **Phase 9: Advanced Graphics (Vector, 3D, CAD):** Professional 3D/CAD formats (Revit, IFC).
-*   **Phase 10: Advanced Archives & Installers:** Platform-specific archives (DMG, WIM, DEB, APK).
-*   **Phase 11: Fonts & Design:** Advanced font conversions and design assets.
-*   **Phase 12: Scientific & GIS Data:** Specialized formats (FITS, NetCDF, HDF5, DICOM).
-*   **Phase 13: Databases & Structured Data:** Advanced database and structured data conversions (Parquet, Avro).
-*   **Phase 14: Programming & Data Science:** Developer tools (Jupyter, R data, ONNX, Pickle).
-*   **Phase 15: Legacy & Specialized Industry:** Retro formats (WordPerfect) and industry-specific workflows (Ableton, Outlook PST).
+### Future Implementation Roadmap: Advanced Conversions
+(These can be assigned as follow-up tasks after the main roadmap is complete)
+*   **Phase 8: Advanced Documents & E-Books**
+*   **Phase 9: Advanced Graphics (Vector, 3D, CAD)**
+*   **Phase 10: Advanced Archives & Installers**
+*   **Phase 11: Fonts & Design**
+*   **Phase 12: Scientific & GIS Data**
+*   **Phase 13: Databases & Structured Data**
+*   **Phase 14: Programming & Data Science**
+*   **Phase 15: Legacy & Specialized Industry**
 
----
-
-## Future Implementation Roadmap: Developer Utilities
-
-This section outlines a suite of client-side JavaScript tools for developers.
-
-*   **Phase A (Text & Data):** Visual Diff Viewer, JSON/JS Formatter, Data Cleaner, Config Converter (YAML/TOML to JSON).
+### Future Implementation Roadmap: Developer Utilities
+(Assigned to Task 5)
+*   **Phase A (Text & Data):** Visual Diff Viewer, JSON/JS Formatter, Data Cleaner, Config Converter.
 *   **Phase B (Web & Security):** JWT Playground, Regex Sandbox, HTML Cleaner.
 *   **Phase C (Performance & Build):** Client-side Minifier, Pixel-diff tool.
