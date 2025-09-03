@@ -21,6 +21,7 @@ const RotatePagesIcon = () => (<svg xmlns="http://www.w3.org/2000/svg" className
 const ExtractTextIcon = () => (<svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25H12" /></svg>);
 const ReorderPagesIcon = () => (<svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M3 7.5L7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5" /></svg>);
 const MetadataIcon = () => (<svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>);
+const CadConvertIcon = () => (<svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 20.25c4.97 0 9-4.03 9-9s-4.03-9-9-9-9 4.03-9 9 4.03 9 9 9z" /><path strokeLinecap="round" strokeLinejoin="round" d="M12 15a3 3 0 100-6 3 3 0 000 6z" /><path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1M21 12h-1M12 21v-1M3 12H2" /></svg>);
 
 export const TOOLS: ToolInfo[] = [
   // Organize & Modify
@@ -41,6 +42,7 @@ export const TOOLS: ToolInfo[] = [
   { key: Tool.CsvXlsxConvert, title: 'CSV <> Excel Converter', description: 'Convert between CSV and XLSX (Excel) formats.', icon: <CsvXlsxConvertIcon />, category: ToolCategory.Convert },
   { key: Tool.PdfToImages, title: 'PDF to Images', description: 'Convert PDF pages to images (PNG/JPG).', icon: <PdfToImagesIcon />, category: ToolCategory.Convert },
   { key: Tool.ExtractText, title: 'Extract Text', description: 'Pull all text content from a PDF.', icon: <ExtractTextIcon />, category: ToolCategory.Convert },
+  { key: Tool.CadConvert, title: 'CAD to PDF', description: 'Convert DXF files to PDF.', icon: <CadConvertIcon />, category: ToolCategory.Convert },
 
   // Optimize & Secure
   { key: Tool.Compress, title: 'Compress PDF', description: 'Reduce the file size of your PDF.', icon: <CompressIcon />, category: ToolCategory.Optimize },
