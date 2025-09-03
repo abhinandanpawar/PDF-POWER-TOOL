@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.io.StringWriter;
 
 @Service
 public class DocConvertService {
@@ -41,7 +42,8 @@ public class DocConvertService {
      */
     public String convertDocToTxt(InputStream inputStream) throws Exception {
         WordprocessingMLPackage wordMLPackage = WordprocessingMLPackage.load(inputStream);
-        // Using Docx4J's utility to extract text from the main document part.
-        return org.docx4j.TextUtils.extractText(wordMLPackage.getMainDocumentPart());
+        StringWriter sw = new StringWriter();
+        org.docx4j.TextUtils.extractText(wordMLPackage.getMainDocumentPart(), sw);
+        return sw.toString();
     }
 }
