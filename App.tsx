@@ -26,6 +26,7 @@ import ExtractTextView from './features/ExtractTextView';
 import ReorderPagesView from './features/ReorderPagesView';
 import GetMetadataView from './features/GetMetadataView';
 import SetMetadataView from './features/SetMetadataView';
+import CadConvertView from './features/CadConvertView';
 
 const App: React.FC = () => {
   const [activeTool, setActiveTool] = useState<Tool | null>(null);
@@ -69,6 +70,7 @@ const App: React.FC = () => {
       case Tool.ReorderPages: return <ReorderPagesView onBack={handleGoBack} />;
       case Tool.GetMetadata: return <GetMetadataView onBack={handleGoBack} />;
       case Tool.SetMetadata: return <SetMetadataView onBack={handleGoBack} />;
+      case Tool.CadConvert: return <CadConvertView onBack={handleGoBack} />;
       default: return null;
     }
   };
