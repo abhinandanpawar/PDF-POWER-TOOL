@@ -13,11 +13,12 @@ import WatermarkView from './features/WatermarkView';
 import PdfToWordView from './features/PdfToWordView';
 import DocToPdfView from './features/DocToPdfView';
 import DocToTxtView from './features/DocToTxtView';
-import ImageConvertView from './features/ImageConvertView';
 import MarkdownConvertView from './features/MarkdownConvertView';
 import PptConvertView from './features/PptConvertView';
 import SpreadsheetConvertView from './features/SpreadsheetConvertView';
 import CsvXlsxView from './features/CsvXlsxView';
+import AudioConvertView from './features/AudioConvertView';
+import VideoConvertView from './features/VideoConvertView';
 import PdfToImagesView from './features/PdfToImagesView';
 import DeletePagesView from './features/DeletePagesView';
 import ProtectView from './features/ProtectView';
@@ -26,6 +27,13 @@ import ExtractTextView from './features/ExtractTextView';
 import ReorderPagesView from './features/ReorderPagesView';
 import GetMetadataView from './features/GetMetadataView';
 import SetMetadataView from './features/SetMetadataView';
+import CadConvertView from './features/CadConvertView';
+
+// Developer Tools
+import DiffViewerView from './features/DiffViewerView';
+import JsonFormatterView from './features/JsonFormatterView';
+import DataCleanerView from './features/DataCleanerView';
+import ConfigConverterView from './features/ConfigConverterView';
 
 const App: React.FC = () => {
   const [activeTool, setActiveTool] = useState<Tool | null>(null);
@@ -56,11 +64,12 @@ const App: React.FC = () => {
       case Tool.PdfToWord: return <PdfToWordView onBack={handleGoBack} />;
       case Tool.DocToPdf: return <DocToPdfView onBack={handleGoBack} />;
       case Tool.DocToTxt: return <DocToTxtView onBack={handleGoBack} />;
-      case Tool.ImageConvert: return <ImageConvertView onBack={handleGoBack} />;
       case Tool.MarkdownConvert: return <MarkdownConvertView onBack={handleGoBack} />;
       case Tool.PptConvert: return <PptConvertView onBack={handleGoBack} />;
       case Tool.SpreadsheetConvert: return <SpreadsheetConvertView onBack={handleGoBack} />;
       case Tool.CsvXlsxConvert: return <CsvXlsxView onBack={handleGoBack} />;
+      case Tool.AudioConvert: return <AudioConvertView onBack={handleGoBack} />;
+      case Tool.VideoConvert: return <VideoConvertView onBack={handleGoBack} />;
       case Tool.PdfToImages: return <PdfToImagesView onBack={handleGoBack} />;
       case Tool.DeletePages: return <DeletePagesView onBack={handleGoBack} />;
       case Tool.Protect: return <ProtectView onBack={handleGoBack} />;
@@ -69,6 +78,15 @@ const App: React.FC = () => {
       case Tool.ReorderPages: return <ReorderPagesView onBack={handleGoBack} />;
       case Tool.GetMetadata: return <GetMetadataView onBack={handleGoBack} />;
       case Tool.SetMetadata: return <SetMetadataView onBack={handleGoBack} />;
+      // Developer Tools
+      case Tool.DiffView: return <DiffViewerView onBack={handleGoBack} />;
+      case Tool.JsonFormat: return <JsonFormatterView onBack={handleGoBack} />;
+      case Tool.DataClean: return <DataCleanerView onBack={handleGoBack} />;
+      case Tool.ConfigConvert: return <ConfigConverterView onBack={handleGoBack} />;
+
+
+      case Tool.CadConvert: return <CadConvertView onBack={handleGoBack} />;
+
       default: return null;
     }
   };

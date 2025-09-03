@@ -208,6 +208,40 @@ export const convertCsvXlsx = async (file: File) => {
     }
 };
 
+export const convertAudio = async (file: File, format: string) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('format', format);
+    const response = await fetch(`${BASE_URL}/multimedia-convert/audio`, { method: 'POST', body: formData });
+
+    let outputFilename = `converted.${format}`;
+    if (file.name) {
+        const dotIndex = file.name.lastIndexOf('.');
+        if (dotIndex > 0) {
+            outputFilename = file.name.substring(0, dotIndex) + `.${format}`;
+        }
+    }
+
+    await processFileResponse(response, outputFilename);
+};
+
+export const convertVideo = async (file: File, format: string) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('format', format);
+    const response = await fetch(`${BASE_URL}/multimedia-convert/video`, { method: 'POST', body: formData });
+
+    let outputFilename = `converted.${format}`;
+    if (file.name) {
+        const dotIndex = file.name.lastIndexOf('.');
+        if (dotIndex > 0) {
+            outputFilename = file.name.substring(0, dotIndex) + `.${format}`;
+        }
+    }
+
+    await processFileResponse(response, outputFilename);
+};
+
 export const convertPdfToImages = async (files: File[], format: string, dpi: number) => {
     const formData = new FormData();
     files.forEach(file => formData.append('files', file));

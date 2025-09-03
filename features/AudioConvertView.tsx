@@ -1,21 +1,21 @@
 import React, { useState } from 'react';
 import ToolPageLayout from '../components/ToolPageLayout';
 import FileUpload from '../components/FileUpload';
-import { convertImage } from '../services/apiService';
+import { convertAudio } from '../services/apiService';
 import { useToasts } from '../hooks/useToasts';
 import { useLoading } from '../hooks/useLoading';
 
-type ImageFormat = 'jpg' | 'png' | 'webp';
+type AudioFormat = 'mp3' | 'wav' | 'flac' | 'ogg';
 
-const ImageConvertView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
+const AudioConvertView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const [files, setFiles] = useState<File[]>([]);
-  const [outputFormat, setOutputFormat] = useState<ImageFormat>('png');
+  const [outputFormat, setOutputFormat] = useState<AudioFormat>('mp3');
   const { addToast } = useToasts();
   const { showLoading, hideLoading } = useLoading();
 
   const handleConvert = async () => {
     if (files.length === 0) {
-      addToast('error', 'Please select an image file to convert.');
+      addToast('error', 'Please select an audio file to convert.');
       return;
     }
     if (files.length > 1) {
@@ -25,7 +25,7 @@ const ImageConvertView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
     showLoading();
     try {
-      await convertImage(files[0], outputFormat);
+      await convertAudio(files[0], outputFormat);
       setFiles([]);
       addToast('success', `Converted to ${outputFormat.toUpperCase()} successfully! Your download has started.`);
     } catch (e) {
@@ -37,8 +37,8 @@ const ImageConvertView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
   return (
     <ToolPageLayout
-      title="Convert Image"
-      description="Convert images to and from formats like JPG, PNG, WEBP, and HEIC."
+      title="Convert Audio"
+      description="Convert audio files to different formats like MP3, WAV, FLAC, and OGG."
       onBack={onBack}
     >
       <div className="space-y-6">
@@ -51,12 +51,13 @@ const ImageConvertView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
             <select
                 id="format-select"
                 value={outputFormat}
-                onChange={(e) => setOutputFormat(e.target.value as ImageFormat)}
+                onChange={(e) => setOutputFormat(e.target.value as AudioFormat)}
                 className="bg-secondary border border-border rounded-lg p-3 text-text-primary focus:ring-primary focus:border-primary"
             >
-                <option value="png">PNG</option>
-                <option value="jpg">JPG</option>
-                <option value="webp">WEBP</option>
+                <option value="mp3">MP3</option>
+                <option value="wav">WAV</option>
+                <option value="flac">FLAC</option>
+                <option value="ogg">OGG</option>
             </select>
         </div>
 
@@ -65,11 +66,11 @@ const ImageConvertView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           disabled={files.length === 0}
           className="w-full bg-primary text-white font-bold py-3 px-4 rounded-lg hover:bg-primary-hover disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors"
         >
-          Convert Image
+          Convert Audio
         </button>
       </div>
     </ToolPageLayout>
   );
 };
 
-export default ImageConvertView;
+export default AudioConvertView;
