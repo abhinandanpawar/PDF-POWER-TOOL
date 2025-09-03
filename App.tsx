@@ -34,6 +34,8 @@ import DiffViewerView from './features/DiffViewerView';
 import JsonFormatterView from './features/JsonFormatterView';
 import DataCleanerView from './features/DataCleanerView';
 import ConfigConverterView from './features/ConfigConverterView';
+import NotepadView from './features/NotepadView';
+import ReloadPrompt from './components/ReloadPrompt';
 
 const App: React.FC = () => {
   const [activeTool, setActiveTool] = useState<Tool | null>(null);
@@ -83,6 +85,7 @@ const App: React.FC = () => {
       case Tool.JsonFormat: return <JsonFormatterView onBack={handleGoBack} />;
       case Tool.DataClean: return <DataCleanerView onBack={handleGoBack} />;
       case Tool.ConfigConvert: return <ConfigConverterView onBack={handleGoBack} />;
+      case Tool.Notepad: return <NotepadView onBack={handleGoBack} />;
 
 
       case Tool.CadConvert: return <CadConvertView onBack={handleGoBack} />;
@@ -95,6 +98,7 @@ const App: React.FC = () => {
     <div className="min-h-screen bg-background font-sans">
       <LoadingOverlay />
       <ToastContainer />
+      <ReloadPrompt />
       <header className="bg-secondary p-4 shadow-md sticky top-0 z-10 border-b border-border">
         <div className="container mx-auto max-w-6xl">
           <h1 

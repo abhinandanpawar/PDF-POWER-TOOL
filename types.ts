@@ -27,6 +27,7 @@ export enum Tool {
   JsonFormat = 'json-format',
   DataClean = 'data-clean',
   ConfigConvert = 'config-convert',
+  Notepad = 'notepad',
 
   CadConvert = 'cad-convert',
 

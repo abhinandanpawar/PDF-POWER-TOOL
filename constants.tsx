@@ -1,6 +1,6 @@
 import React from 'react';
 import { Tool, ToolInfo, ToolCategory } from './types';
-import { GitCompareArrows, Braces, Sparkles, FileCog } from 'lucide-react';
+import { GitCompareArrows, Braces, Sparkles, FileCog, Notebook } from 'lucide-react';
 
 // Icon components
 const MergeIcon = () => (<svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 9.75h16.5m-16.5 4.5h16.5m-16.5 4.5h16.5M3.75 6.75h16.5" /></svg>);
@@ -60,4 +60,5 @@ export const TOOLS: ToolInfo[] = [
   { key: Tool.JsonFormat, title: 'JSON Formatter', description: 'Format or minify your JSON data.', icon: <Braces />, category: ToolCategory.Developer },
   { key: Tool.DataClean, title: 'Data Cleaner', description: 'Clean and transform your text data.', icon: <Sparkles />, category: ToolCategory.Developer },
   { key: Tool.ConfigConvert, title: 'Config Converter', description: 'Convert between different config file formats.', icon: <FileCog />, category: ToolCategory.Developer },
+  { key: Tool.Notepad, title: 'Offline Notepad', description: 'A multi-tab code editor that saves automatically.', icon: <Notebook />, category: ToolCategory.Developer },
 ];
