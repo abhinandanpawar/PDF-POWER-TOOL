@@ -66,6 +66,92 @@ export const convertPdfToWord = async (files: File[]) => {
     await processFileResponse(response, 'converted_word.zip');
 };
 
+export const convertWordToPdf = async (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await fetch(`${BASE_URL}/doc-convert/to-pdf`, { method: 'POST', body: formData });
+
+    let outputFilename = 'converted.pdf';
+    if (file.name) {
+        const dotIndex = file.name.lastIndexOf('.');
+        if (dotIndex > 0) {
+            outputFilename = file.name.substring(0, dotIndex) + ".pdf";
+        }
+    }
+
+    await processFileResponse(response, outputFilename);
+};
+
+export const convertWordToTxt = async (file: File): Promise<string> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await fetch(`${BASE_URL}/doc-convert/to-txt`, { method: 'POST', body: formData });
+    await handleApiResponse(response);
+    return await response.text();
+};
+
+export const convertImage = async (file: File, format: string) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('format', format);
+    const response = await fetch(`${BASE_URL}/image-convert/convert`, { method: 'POST', body: formData });
+
+    let outputFilename = `converted.${format}`;
+    if (file.name) {
+        const dotIndex = file.name.lastIndexOf('.');
+        if (dotIndex > 0) {
+            outputFilename = file.name.substring(0, dotIndex) + `.${format}`;
+        }
+    }
+
+    await processFileResponse(response, outputFilename);
+};
+
+export const convertMarkdown = async (file: File, format: 'html' | 'pdf') => {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const endpoint = `${BASE_URL}/markdown-convert/to-${format}`;
+    const response = await fetch(endpoint, { method: 'POST', body: formData });
+    await handleApiResponse(response);
+
+    let outputFilename = `converted.${format}`;
+    if (file.name) {
+        const dotIndex = file.name.lastIndexOf('.');
+        if (dotIndex > 0) {
+            outputFilename = file.name.substring(0, dotIndex) + `.${format}`;
+        }
+    }
+
+    if (format === 'html') {
+        const html = await response.text();
+        const blob = new Blob([html], { type: 'text/html' });
+        downloadFile(blob, outputFilename);
+    } else {
+        const blob = await response.blob();
+        downloadFile(blob, outputFilename);
+    }
+};
+
+export const convertPpt = async (file: File, format: 'pdf' | 'images') => {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const endpoint = `${BASE_URL}/ppt-convert/to-${format}`;
+    const response = await fetch(endpoint, { method: 'POST', body: formData });
+
+    const outputExtension = format === 'pdf' ? 'pdf' : 'zip';
+    let outputFilename = `converted.${outputExtension}`;
+    if (file.name) {
+        const dotIndex = file.name.lastIndexOf('.');
+        if (dotIndex > 0) {
+            outputFilename = file.name.substring(0, dotIndex) + `.${outputExtension}`;
+        }
+    }
+
+    await processFileResponse(response, outputFilename);
+};
+
 export const convertPdfToImages = async (files: File[], format: string, dpi: number) => {
     const formData = new FormData();
     files.forEach(file => formData.append('files', file));
