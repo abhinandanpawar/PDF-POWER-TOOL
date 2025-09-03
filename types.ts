@@ -29,7 +29,7 @@ export enum Tool {
   ConfigConvert = 'config-convert',
 
   CadConvert = 'cad-convert',
-
+  ImageEditor = 'image-editor',
 }
 
 export enum ToolCategory {
@@ -37,6 +37,7 @@ export enum ToolCategory {
   Convert = 'Convert & Extract',
   Optimize = 'Optimize & Secure',
   Annotate = 'Annotate & Metadata',
+  Image = 'Image',
   Developer = 'Developer Tools',
 }
 

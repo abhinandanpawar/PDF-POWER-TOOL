@@ -34,6 +34,7 @@ import DiffViewerView from './features/DiffViewerView';
 import JsonFormatterView from './features/JsonFormatterView';
 import DataCleanerView from './features/DataCleanerView';
 import ConfigConverterView from './features/ConfigConverterView';
+import ImageEditorView from './features/ImageEditorView';
 
 const App: React.FC = () => {
   const [activeTool, setActiveTool] = useState<Tool | null>(null);
@@ -86,6 +87,7 @@ const App: React.FC = () => {
 
 
       case Tool.CadConvert: return <CadConvertView onBack={handleGoBack} />;
+      case Tool.ImageEditor: return <ImageEditorView onBack={handleGoBack} />;
 
       default: return null;
     }
