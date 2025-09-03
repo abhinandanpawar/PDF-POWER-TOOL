@@ -19,6 +19,12 @@ export enum Tool {
   ReorderPages = 'reorder-pages',
   GetMetadata = 'get-metadata',
   SetMetadata = 'set-metadata',
+
+  // Developer Tools
+  DiffView = 'diff-view',
+  JsonFormat = 'json-format',
+  DataClean = 'data-clean',
+  ConfigConvert = 'config-convert',
 }
 
 export enum ToolCategory {
@@ -26,6 +32,7 @@ export enum ToolCategory {
   Convert = 'Convert & Extract',
   Optimize = 'Optimize & Secure',
   Annotate = 'Annotate & Metadata',
+  Developer = 'Developer Tools',
 }
 
 export interface ToolInfo {

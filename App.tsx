@@ -27,6 +27,12 @@ import ReorderPagesView from './features/ReorderPagesView';
 import GetMetadataView from './features/GetMetadataView';
 import SetMetadataView from './features/SetMetadataView';
 
+// Developer Tools
+import DiffViewerView from './features/DiffViewerView';
+import JsonFormatterView from './features/JsonFormatterView';
+import DataCleanerView from './features/DataCleanerView';
+import ConfigConverterView from './features/ConfigConverterView';
+
 const App: React.FC = () => {
   const [activeTool, setActiveTool] = useState<Tool | null>(null);
 
@@ -69,6 +75,13 @@ const App: React.FC = () => {
       case Tool.ReorderPages: return <ReorderPagesView onBack={handleGoBack} />;
       case Tool.GetMetadata: return <GetMetadataView onBack={handleGoBack} />;
       case Tool.SetMetadata: return <SetMetadataView onBack={handleGoBack} />;
+
+      // Developer Tools
+      case Tool.DiffView: return <DiffViewerView onBack={handleGoBack} />;
+      case Tool.JsonFormat: return <JsonFormatterView onBack={handleGoBack} />;
+      case Tool.DataClean: return <DataCleanerView onBack={handleGoBack} />;
+      case Tool.ConfigConvert: return <ConfigConverterView onBack={handleGoBack} />;
+
       default: return null;
     }
   };
