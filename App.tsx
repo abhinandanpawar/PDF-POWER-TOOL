@@ -13,7 +13,6 @@ import WatermarkView from './features/WatermarkView';
 import PdfToWordView from './features/PdfToWordView';
 import DocToPdfView from './features/DocToPdfView';
 import DocToTxtView from './features/DocToTxtView';
-import ImageConvertView from './features/ImageConvertView';
 import MarkdownConvertView from './features/MarkdownConvertView';
 import PptConvertView from './features/PptConvertView';
 import SpreadsheetConvertView from './features/SpreadsheetConvertView';
@@ -65,7 +64,6 @@ const App: React.FC = () => {
       case Tool.PdfToWord: return <PdfToWordView onBack={handleGoBack} />;
       case Tool.DocToPdf: return <DocToPdfView onBack={handleGoBack} />;
       case Tool.DocToTxt: return <DocToTxtView onBack={handleGoBack} />;
-      case Tool.ImageConvert: return <ImageConvertView onBack={handleGoBack} />;
       case Tool.MarkdownConvert: return <MarkdownConvertView onBack={handleGoBack} />;
       case Tool.PptConvert: return <PptConvertView onBack={handleGoBack} />;
       case Tool.SpreadsheetConvert: return <SpreadsheetConvertView onBack={handleGoBack} />;

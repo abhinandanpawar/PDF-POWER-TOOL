@@ -34,10 +34,6 @@
         </dependency>
         <dependency>
             <groupId>com.example</groupId>
-            <artifactId>pdf-convert</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.example</groupId>
             <artifactId>pdf-protect</artifactId>
         </dependency>
         <dependency>
@@ -67,6 +63,22 @@
         <dependency>
             <groupId>com.example</groupId>
             <artifactId>pdf-metadata</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.example</groupId>
+            <artifactId>pdf-convert</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.example</groupId>
+            <artifactId>spreadsheet-convert</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.example</groupId>
+            <artifactId>ppt-convert</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.example</groupId>
+            <artifactId>markdown-convert</artifactId>
         </dependency>
 
         <!-- Spring Boot -->
