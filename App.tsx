@@ -36,6 +36,7 @@ import DataCleanerView from './features/DataCleanerView';
 import ConfigConverterView from './features/ConfigConverterView';
 import NotepadView from './features/NotepadView';
 import ReloadPrompt from './components/ReloadPrompt';
+import PasswordGeneratorView from './features/PasswordGeneratorView';
 
 const App: React.FC = () => {
   const [activeTool, setActiveTool] = useState<Tool | null>(null);
@@ -86,6 +87,7 @@ const App: React.FC = () => {
       case Tool.DataClean: return <DataCleanerView onBack={handleGoBack} />;
       case Tool.ConfigConvert: return <ConfigConverterView onBack={handleGoBack} />;
       case Tool.Notepad: return <NotepadView onBack={handleGoBack} />;
+      case Tool.PasswordGenerator: return <PasswordGeneratorView onBack={handleGoBack} />;
 
 
       case Tool.CadConvert: return <CadConvertView onBack={handleGoBack} />;

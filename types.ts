@@ -28,6 +28,7 @@ export enum Tool {
   DataClean = 'data-clean',
   ConfigConvert = 'config-convert',
   Notepad = 'notepad',
+  PasswordGenerator = 'password-generator',
 
   CadConvert = 'cad-convert',
 
