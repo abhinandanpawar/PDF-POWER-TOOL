@@ -1,3 +1,5 @@
+import pica from 'pica';
+
 export const createImage = (url: string): Promise<HTMLImageElement> =>
   new Promise((resolve, reject) => {
     const image = new Image();
@@ -7,7 +9,7 @@ export const createImage = (url: string): Promise<HTMLImageElement> =>
     image.src = url;
   });
 
-export default async function getCroppedImg(imageSrc: string, pixelCrop: any) {
+export async function getCroppedImg(imageSrc: string, pixelCrop: any) {
   const image = await createImage(imageSrc);
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
@@ -40,4 +42,15 @@ export default async function getCroppedImg(imageSrc: string, pixelCrop: any) {
 
   // As Base64 string
   return canvas.toDataURL('image/jpeg');
+}
+
+export async function resizeImage(imageSrc: string, width: number, height: number) {
+  const from = await createImage(imageSrc);
+  const to = document.createElement('canvas');
+  to.width = width;
+  to.height = height;
+
+  const picaInstance = pica();
+  const result = await picaInstance.resize(from, to);
+  return result.toDataURL();
 }
