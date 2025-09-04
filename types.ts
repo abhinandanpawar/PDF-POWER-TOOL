@@ -13,6 +13,7 @@ export enum Tool {
   AudioConvert = 'audio-convert',
   VideoConvert = 'video-convert',
   PdfToImages = 'pdf-to-images',
+  FileExporter = 'file-exporter',
   DeletePages = 'delete-pages',
   Protect = 'protect',
   RotatePages = 'rotate-pages',
@@ -27,6 +28,8 @@ export enum Tool {
   JsonFormat = 'json-format',
   DataClean = 'data-clean',
   ConfigConvert = 'config-convert',
+  Notepad = 'notepad',
+  PasswordGenerator = 'password-generator',
 
   CadConvert = 'cad-convert',
   ImageEditor = 'image-editor',
