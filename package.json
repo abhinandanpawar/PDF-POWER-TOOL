@@ -10,30 +10,22 @@
     "test": "vitest"
   },
   "dependencies": {
-
     "@types/js-yaml": "^4.0.9",
     "js-yaml": "^4.1.0",
-
     "@types/three": "^0.180.0",
     "dxf-parser": "^1.1.2",
     "jspdf": "^3.0.2",
-
     "lucide-react": "^0.417.0",
     "react": "^18.3.1",
     "react-diff-viewer-continued": "^3.4.0",
     "react-dom": "^18.3.1",
     "react-dropzone": "^14.2.3",
-
+    "three": "^0.180.0",
     "xml-js": "^1.6.11"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.8.0",
     "@testing-library/react": "^16.3.0",
-
-    "three": "^0.180.0"
-  },
-  "devDependencies": {
-
     "@types/node": "^22.14.0",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
