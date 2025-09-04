@@ -17,12 +17,25 @@ const ImageEditorView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
   const [width, setWidth] = useState(0);
   const [height, setHeight] = useState(0);
+  const [originalWidth, setOriginalWidth] = useState(0);
+  const [originalHeight, setOriginalHeight] = useState(0);
+  const [aspectRatio, setAspectRatio] = useState(1);
+  const [lockAspectRatio, setLockAspectRatio] = useState(true);
   const [currentStep, setCurrentStep] = useState(0);
 
   const handleFile = (file: File) => {
     const reader = new FileReader();
     reader.onload = () => {
-      setImage(reader.result as string);
+      const imageUrl = reader.result as string;
+      setImage(imageUrl);
+
+      const img = new Image();
+      img.src = imageUrl;
+      img.onload = () => {
+        setOriginalWidth(img.width);
+        setOriginalHeight(img.height);
+      };
+
       setCurrentStep(1);
     };
     reader.readAsDataURL(file);
@@ -40,12 +53,45 @@ const ImageEditorView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           croppedAreaPixels,
         );
         setCroppedImage(croppedImage);
+
+        // Get dimensions of cropped image
+        const img = new Image();
+        img.src = croppedImage;
+        img.onload = () => {
+          setWidth(img.width);
+          setHeight(img.height);
+          setOriginalWidth(img.width);
+          setOriginalHeight(img.height);
+          setAspectRatio(img.width / img.height);
+        };
+
         setCurrentStep(2);
       }
     } catch (e) {
       console.error(e);
     }
   }, [image, croppedAreaPixels]);
+
+  const handleDimensionChange = (e: React.ChangeEvent<HTMLInputElement>, dimension: 'width' | 'height') => {
+    const value = parseInt(e.target.value);
+    if (isNaN(value) || value < 0) {
+      if (dimension === 'width') setWidth(0);
+      else setHeight(0);
+      return;
+    }
+
+    if (dimension === 'width') {
+      setWidth(value);
+      if (lockAspectRatio) {
+        setHeight(Math.round(value / aspectRatio));
+      }
+    } else {
+      setHeight(value);
+      if (lockAspectRatio) {
+        setWidth(Math.round(value * aspectRatio));
+      }
+    }
+  };
 
   const handleResize = async () => {
     if (!croppedImage) return;
@@ -87,7 +133,7 @@ const ImageEditorView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
               image={image}
               crop={crop}
               zoom={zoom}
-              aspect={1}
+              aspect={originalWidth / originalHeight || 1}
               onCropChange={setCrop}
               onZoomChange={setZoom}
               onCropComplete={onCropComplete}
@@ -106,16 +152,28 @@ const ImageEditorView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                 <input
                   type="number"
                   placeholder="Width"
-                  onChange={(e) => setWidth(parseInt(e.target.value))}
+                  value={width}
+                  onChange={(e) => handleDimensionChange(e, 'width')}
                   className="p-2 border rounded"
                 />
                 <input
                   type="number"
                   placeholder="Height"
-                  onChange={(e) => setHeight(parseInt(e.target.value))}
+                  value={height}
+                  onChange={(e) => handleDimensionChange(e, 'height')}
                   className="p-2 border rounded"
                 />
-                <Button onClick={handleResize}>Resize Image</Button>
+                <Button onClick={handleResize} disabled={width === 0 || height === 0}>Resize Image</Button>
+              </div>
+              <div className="mt-4 flex justify-center items-center">
+                <input
+                  type="checkbox"
+                  id="lock-aspect-ratio"
+                  checked={lockAspectRatio}
+                  onChange={() => setLockAspectRatio(!lockAspectRatio)}
+                  className="mr-2"
+                />
+                <label htmlFor="lock-aspect-ratio">Lock aspect ratio</label>
               </div>
               <div className="mt-4">
                 <Button onClick={() => handleDownload(croppedImage, 'cropped-image.png')}>Download Cropped Image</Button>
