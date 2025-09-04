@@ -1,15 +1,17 @@
 import React, { useState, useCallback } from 'react';
 import Cropper from 'react-easy-crop';
+import { RotateCcw, RotateCw, FlipHorizontal, FlipVertical } from 'lucide-react';
 import ToolPageLayout from '../components/ToolPageLayout';
 import { Button } from '../components/Button';
 import { Dropzone } from '../components/Dropzone';
 import { Steps } from '../components/Steps';
-import { getCroppedImg, resizeImage } from './imageUtils';
+import { getCroppedImg, resizeImage, transformImage } from './imageUtils';
 
 const STEPS = ['Upload', 'Crop', 'Resize', 'Finish'];
 
 const ImageEditorView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const [image, setImage] = useState<string | null>(null);
+  const [originalImage, setOriginalImage] = useState<string | null>(null);
   const [croppedImage, setCroppedImage] = useState<string | null>(null);
   const [resizedImage, setResizedImage] = useState<string | null>(null);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
@@ -21,7 +23,19 @@ const ImageEditorView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const [originalHeight, setOriginalHeight] = useState(0);
   const [aspectRatio, setAspectRatio] = useState(1);
   const [lockAspectRatio, setLockAspectRatio] = useState(true);
+
+  const [rotation, setRotation] = useState(0);
+  const [flip, setFlip] = useState({ horizontal: false, vertical: false });
+
   const [currentStep, setCurrentStep] = useState(0);
+
+  const handleRotate = (angle: number) => {
+    setRotation(rotation + angle);
+  };
+
+  const handleFlip = (axis: 'horizontal' | 'vertical') => {
+    setFlip({ ...flip, [axis]: !flip[axis] });
+  };
 
   const handleFile = (file: File) => {
     const reader = new FileReader();
@@ -29,12 +43,19 @@ const ImageEditorView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       const imageUrl = reader.result as string;
       setImage(imageUrl);
 
+      setOriginalImage(imageUrl);
+
       const img = new Image();
       img.src = imageUrl;
       img.onload = () => {
         setOriginalWidth(img.width);
         setOriginalHeight(img.height);
+
+        setAspectRatio(img.width / img.height);
       };
+
+      };
+
 
       setCurrentStep(1);
     };
@@ -48,10 +69,17 @@ const ImageEditorView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const showCroppedImage = useCallback(async () => {
     try {
       if (image && croppedAreaPixels) {
-        const croppedImage = await getCroppedImg(
+        const cropped = await getCroppedImg(
           image,
           croppedAreaPixels,
         );
+
+        if (cropped) {
+          const transformed = await transformImage(cropped, rotation, flip);
+          setCroppedImage(transformed);
+          setCurrentStep(2);
+        }
+
         setCroppedImage(croppedImage);
 
         // Get dimensions of cropped image
@@ -66,11 +94,33 @@ const ImageEditorView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         };
 
         setCurrentStep(2);
+
       }
     } catch (e) {
       console.error(e);
     }
-  }, [image, croppedAreaPixels]);
+  }, [image, croppedAreaPixels, rotation, flip]);
+
+  const handleDimensionChange = (e: React.ChangeEvent<HTMLInputElement>, dimension: 'width' | 'height') => {
+    const value = parseInt(e.target.value);
+    if (isNaN(value) || value < 0) {
+      if (dimension === 'width') setWidth(0);
+      else setHeight(0);
+      return;
+    }
+
+    if (dimension === 'width') {
+      setWidth(value);
+      if (lockAspectRatio) {
+        setHeight(Math.round(value / aspectRatio));
+      }
+    } else {
+      setHeight(value);
+      if (lockAspectRatio) {
+        setWidth(Math.round(value * aspectRatio));
+      }
+    }
+  };
 
   const handleDimensionChange = (e: React.ChangeEvent<HTMLInputElement>, dimension: 'width' | 'height') => {
     const value = parseInt(e.target.value);
@@ -129,8 +179,11 @@ const ImageEditorView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
   const handleReset = () => {
     setImage(null);
+    setOriginalImage(null);
     setCroppedImage(null);
     setResizedImage(null);
+    setRotation(0);
+    setFlip({ horizontal: false, vertical: false });
     setCurrentStep(0);
   };
 
@@ -141,6 +194,32 @@ const ImageEditorView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       case 1:
         return (
           <div className="relative h-[400px]">
+
+            <div
+              className="absolute inset-0"
+              style={{
+                transform: `scale(${flip.horizontal ? -1 : 1}, ${
+                  flip.vertical ? -1 : 1
+                })`,
+              }}
+            >
+              <Cropper
+                image={image}
+                crop={crop}
+                zoom={zoom}
+                aspect={originalWidth / originalHeight || 1}
+                rotation={rotation}
+                onCropChange={setCrop}
+                onZoomChange={setZoom}
+                onCropComplete={onCropComplete}
+              />
+            </div>
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center space-x-2">
+              <Button onClick={() => handleRotate(-90)} aria-label="Rotate Left"><RotateCcw /></Button>
+              <Button onClick={() => handleRotate(90)} aria-label="Rotate Right"><RotateCw /></Button>
+              <Button onClick={() => handleFlip('horizontal')} aria-label="Flip Horizontal"><FlipHorizontal /></Button>
+              <Button onClick={() => handleFlip('vertical')} aria-label="Flip Vertical"><FlipVertical /></Button>
+
             <Cropper
               image={image}
               crop={crop}
@@ -151,6 +230,7 @@ const ImageEditorView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
               onCropComplete={onCropComplete}
             />
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2">
+
               <Button onClick={showCroppedImage}>Crop Image</Button>
             </div>
           </div>
