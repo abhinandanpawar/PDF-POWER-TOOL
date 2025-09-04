@@ -1,15 +1,17 @@
 import React, { useState, useCallback } from 'react';
 import Cropper from 'react-easy-crop';
+import { RotateCcw, RotateCw, FlipHorizontal, FlipVertical } from 'lucide-react';
 import ToolPageLayout from '../components/ToolPageLayout';
 import { Button } from '../components/Button';
 import { Dropzone } from '../components/Dropzone';
 import { Steps } from '../components/Steps';
-import { getCroppedImg, resizeImage } from './imageUtils';
+import { getCroppedImg, resizeImage, transformImage } from './imageUtils';
 
 const STEPS = ['Upload', 'Crop', 'Resize', 'Finish'];
 
 const ImageEditorView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const [image, setImage] = useState<string | null>(null);
+  const [originalImage, setOriginalImage] = useState<string | null>(null);
   const [croppedImage, setCroppedImage] = useState<string | null>(null);
   const [resizedImage, setResizedImage] = useState<string | null>(null);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
@@ -17,12 +19,35 @@ const ImageEditorView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
   const [width, setWidth] = useState(0);
   const [height, setHeight] = useState(0);
+  const [originalWidth, setOriginalWidth] = useState(0);
+  const [originalHeight, setOriginalHeight] = useState(0);
+  const [aspectRatio, setAspectRatio] = useState(1);
+  const [lockAspectRatio, setLockAspectRatio] = useState(true);
+  const [rotation, setRotation] = useState(0);
+  const [flip, setFlip] = useState({ horizontal: false, vertical: false });
   const [currentStep, setCurrentStep] = useState(0);
+
+  const handleRotate = (angle: number) => {
+    setRotation(rotation + angle);
+  };
+
+  const handleFlip = (axis: 'horizontal' | 'vertical') => {
+    setFlip({ ...flip, [axis]: !flip[axis] });
+  };
 
   const handleFile = (file: File) => {
     const reader = new FileReader();
     reader.onload = () => {
-      setImage(reader.result as string);
+      const imageUrl = reader.result as string;
+      setImage(imageUrl);
+      setOriginalImage(imageUrl);
+      const img = new Image();
+      img.src = imageUrl;
+      img.onload = () => {
+        setOriginalWidth(img.width);
+        setOriginalHeight(img.height);
+        setAspectRatio(img.width / img.height);
+      };
       setCurrentStep(1);
     };
     reader.readAsDataURL(file);
@@ -35,17 +60,41 @@ const ImageEditorView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const showCroppedImage = useCallback(async () => {
     try {
       if (image && croppedAreaPixels) {
-        const croppedImage = await getCroppedImg(
+        const cropped = await getCroppedImg(
           image,
           croppedAreaPixels,
         );
-        setCroppedImage(croppedImage);
-        setCurrentStep(2);
+        if (cropped) {
+          const transformed = await transformImage(cropped, rotation, flip);
+          setCroppedImage(transformed);
+          setCurrentStep(2);
+        }
       }
     } catch (e) {
       console.error(e);
     }
-  }, [image, croppedAreaPixels]);
+  }, [image, croppedAreaPixels, rotation, flip]);
+
+  const handleDimensionChange = (e: React.ChangeEvent<HTMLInputElement>, dimension: 'width' | 'height') => {
+    const value = parseInt(e.target.value);
+    if (isNaN(value) || value < 0) {
+      if (dimension === 'width') setWidth(0);
+      else setHeight(0);
+      return;
+    }
+
+    if (dimension === 'width') {
+      setWidth(value);
+      if (lockAspectRatio) {
+        setHeight(Math.round(value / aspectRatio));
+      }
+    } else {
+      setHeight(value);
+      if (lockAspectRatio) {
+        setWidth(Math.round(value * aspectRatio));
+      }
+    }
+  };
 
   const handleResize = async () => {
     if (!croppedImage) return;
@@ -63,16 +112,31 @@ const ImageEditorView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     document.body.removeChild(link);
   };
 
-  const handleBack = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
+  const handleStepClick = (step: number) => {
+    if (step < currentStep) {
+      setCurrentStep(step);
+      if (step === 0) {
+        setImage(null);
+        setCroppedImage(null);
+        setResizedImage(null);
+      }
+      if (step === 1) {
+        setCroppedImage(null);
+        setResizedImage(null);
+      }
+      if (step === 2) {
+        setResizedImage(null);
+      }
     }
   };
 
   const handleReset = () => {
     setImage(null);
+    setOriginalImage(null);
     setCroppedImage(null);
     setResizedImage(null);
+    setRotation(0);
+    setFlip({ horizontal: false, vertical: false });
     setCurrentStep(0);
   };
 
@@ -83,16 +147,30 @@ const ImageEditorView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       case 1:
         return (
           <div className="relative h-[400px]">
-            <Cropper
-              image={image}
-              crop={crop}
-              zoom={zoom}
-              aspect={1}
-              onCropChange={setCrop}
-              onZoomChange={setZoom}
-              onCropComplete={onCropComplete}
-            />
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2">
+            <div
+              className="absolute inset-0"
+              style={{
+                transform: `scale(${flip.horizontal ? -1 : 1}, ${
+                  flip.vertical ? -1 : 1
+                })`,
+              }}
+            >
+              <Cropper
+                image={image}
+                crop={crop}
+                zoom={zoom}
+                aspect={originalWidth / originalHeight || 1}
+                rotation={rotation}
+                onCropChange={setCrop}
+                onZoomChange={setZoom}
+                onCropComplete={onCropComplete}
+              />
+            </div>
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center space-x-2">
+              <Button onClick={() => handleRotate(-90)} aria-label="Rotate Left"><RotateCcw /></Button>
+              <Button onClick={() => handleRotate(90)} aria-label="Rotate Right"><RotateCw /></Button>
+              <Button onClick={() => handleFlip('horizontal')} aria-label="Flip Horizontal"><FlipHorizontal /></Button>
+              <Button onClick={() => handleFlip('vertical')} aria-label="Flip Vertical"><FlipVertical /></Button>
               <Button onClick={showCroppedImage}>Crop Image</Button>
             </div>
           </div>
@@ -106,16 +184,28 @@ const ImageEditorView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                 <input
                   type="number"
                   placeholder="Width"
-                  onChange={(e) => setWidth(parseInt(e.target.value))}
+                  value={width}
+                  onChange={(e) => handleDimensionChange(e, 'width')}
                   className="p-2 border rounded"
                 />
                 <input
                   type="number"
                   placeholder="Height"
-                  onChange={(e) => setHeight(parseInt(e.target.value))}
+                  value={height}
+                  onChange={(e) => handleDimensionChange(e, 'height')}
                   className="p-2 border rounded"
                 />
-                <Button onClick={handleResize}>Resize Image</Button>
+                <Button onClick={handleResize} disabled={width === 0 || height === 0}>Resize Image</Button>
+              </div>
+              <div className="mt-4 flex justify-center items-center">
+                <input
+                  type="checkbox"
+                  id="lock-aspect-ratio"
+                  checked={lockAspectRatio}
+                  onChange={() => setLockAspectRatio(!lockAspectRatio)}
+                  className="mr-2"
+                />
+                <label htmlFor="lock-aspect-ratio">Lock aspect ratio</label>
               </div>
               <div className="mt-4">
                 <Button onClick={() => handleDownload(croppedImage, 'cropped-image.png')}>Download Cropped Image</Button>
@@ -144,15 +234,12 @@ const ImageEditorView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       description="Crop, resize, and edit your images."
     >
       <div className="mb-8">
-        <Steps steps={STEPS} currentStep={currentStep} />
+        <Steps steps={STEPS} currentStep={currentStep} onStepClick={handleStepClick} />
       </div>
 
       {renderStep()}
 
       <div className="mt-8 flex justify-center space-x-4">
-        {currentStep > 0 && (
-          <Button onClick={handleBack}>Back</Button>
-        )}
         {currentStep > 0 && (
           <Button onClick={handleReset}>Reset</Button>
         )}
