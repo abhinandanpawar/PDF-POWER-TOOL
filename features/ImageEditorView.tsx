@@ -109,9 +109,21 @@ const ImageEditorView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     document.body.removeChild(link);
   };
 
-  const handleBack = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
+  const handleStepClick = (step: number) => {
+    if (step < currentStep) {
+      setCurrentStep(step);
+      if (step === 0) {
+        setImage(null);
+        setCroppedImage(null);
+        setResizedImage(null);
+      }
+      if (step === 1) {
+        setCroppedImage(null);
+        setResizedImage(null);
+      }
+      if (step === 2) {
+        setResizedImage(null);
+      }
     }
   };
 
@@ -202,15 +214,12 @@ const ImageEditorView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       description="Crop, resize, and edit your images."
     >
       <div className="mb-8">
-        <Steps steps={STEPS} currentStep={currentStep} />
+        <Steps steps={STEPS} currentStep={currentStep} onStepClick={handleStepClick} />
       </div>
 
       {renderStep()}
 
       <div className="mt-8 flex justify-center space-x-4">
-        {currentStep > 0 && (
-          <Button onClick={handleBack}>Back</Button>
-        )}
         {currentStep > 0 && (
           <Button onClick={handleReset}>Reset</Button>
         )}
