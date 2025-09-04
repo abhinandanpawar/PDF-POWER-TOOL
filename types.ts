@@ -13,6 +13,7 @@ export enum Tool {
   AudioConvert = 'audio-convert',
   VideoConvert = 'video-convert',
   PdfToImages = 'pdf-to-images',
+  FileExporter = 'file-exporter',
   DeletePages = 'delete-pages',
   Protect = 'protect',
   RotatePages = 'rotate-pages',
@@ -27,6 +28,7 @@ export enum Tool {
   JsonFormat = 'json-format',
   DataClean = 'data-clean',
   ConfigConvert = 'config-convert',
+
   CsvJsonConverter = 'csv-json-converter',
 
   CadConvert = 'cad-convert',
@@ -46,6 +48,13 @@ export enum Tool {
   FaviconGenerator = 'favicon-generator',
   MemeMaker = 'meme-maker',
   BadgeIdCardMaker = 'badge-id-card-maker',
+
+  Notepad = 'notepad',
+  PasswordGenerator = 'password-generator',
+
+  CadConvert = 'cad-convert',
+  ImageEditor = 'image-editor',
+
 }
 
 export enum ToolCategory {
@@ -53,6 +62,7 @@ export enum ToolCategory {
   Convert = 'Convert & Extract',
   Optimize = 'Optimize & Secure',
   Annotate = 'Annotate & Metadata',
+  Image = 'Image',
   Developer = 'Developer Tools',
   Creative = 'Creative Tools',
 }

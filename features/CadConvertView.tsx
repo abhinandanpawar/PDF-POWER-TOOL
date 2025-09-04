@@ -1,19 +1,14 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import ToolPageLayout from '../components/ToolPageLayout';
 import FileUpload from '../components/FileUpload';
 import { useToasts } from '../hooks/useToasts';
 import { useLoading } from '../hooks/useLoading';
-import * as THREE from 'three';
-import { DxfParser } from 'dxf-parser';
-import jsPDF from 'jspdf';
-
-declare const DxfViewer: any;
+import { convertCadToPdf } from '../services/apiService';
 
 const CadConvertView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const [files, setFiles] = useState<File[]>([]);
   const { addToast } = useToasts();
   const { showLoading, hideLoading } = useLoading();
-  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const handleConvert = async () => {
     if (files.length === 0) {
@@ -27,37 +22,9 @@ const CadConvertView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
     showLoading();
     try {
-      const file = files[0];
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const fileText = event.target?.result as string;
-        const parser = new DxfParser();
-        const dxf = parser.parseSync(fileText);
-
-        if (canvasRef.current) {
-          const viewer = new DxfViewer(canvasRef.current, {
-            autoResize: false,
-            width: 800,
-            height: 600,
-          });
-          viewer.loadDxf(dxf);
-
-          setTimeout(() => {
-            const canvas = canvasRef.current;
-            if (canvas) {
-              const imgData = canvas.toDataURL('image/png');
-              const pdf = new jsPDF();
-              const pdfWidth = pdf.internal.pageSize.getWidth();
-              const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-              pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-              pdf.save('converted.pdf');
-              setFiles([]);
-              addToast('success', 'Converted to PDF successfully! Your download has started.');
-            }
-          }, 1000); // Wait for rendering
-        }
-      };
-      reader.readAsText(file);
+      await convertCadToPdf(files[0]);
+      addToast('success', 'Converted to PDF successfully! Your download has started.');
+      setFiles([]);
     } catch (e) {
       addToast('error', (e as Error).message);
     } finally {
@@ -72,8 +39,7 @@ const CadConvertView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       onBack={onBack}
     >
       <div className="space-y-6">
-        <FileUpload files={files} setFiles={setFiles} accept=".dxf" />
-        <canvas ref={canvasRef} style={{ display: 'none' }} width="800" height="600"></canvas>
+        <FileUpload files={files} setFiles={setFiles} accept=".dxf" multiple={false} />
         <button
           onClick={handleConvert}
           disabled={files.length === 0}
