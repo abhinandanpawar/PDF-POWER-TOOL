@@ -1,6 +1,6 @@
 import React from 'react';
 import { Tool, ToolInfo, ToolCategory } from './types';
-import { GitCompareArrows, Braces, Sparkles, FileCog } from 'lucide-react';
+import { GitCompareArrows, Braces, Sparkles, FileCog, Notebook, KeyRound, FileDown } from 'lucide-react';
 
 // Icon components
 const MergeIcon = () => (<svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 9.75h16.5m-16.5 4.5h16.5m-16.5 4.5h16.5M3.75 6.75h16.5" /></svg>);
@@ -23,6 +23,7 @@ const ExtractTextIcon = () => (<svg xmlns="http://www.w3.org/2000/svg" className
 const ReorderPagesIcon = () => (<svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M3 7.5L7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5" /></svg>);
 const MetadataIcon = () => (<svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>);
 const CadConvertIcon = () => (<svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 20.25c4.97 0 9-4.03 9-9s-4.03-9-9-9-9 4.03-9 9 4.03 9 9 9z" /><path strokeLinecap="round" strokeLinejoin="round" d="M12 15a3 3 0 100-6 3 3 0 000 6z" /><path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1M21 12h-1M12 21v-1M3 12H2" /></svg>);
+const ImageEditorIcon = () => (<svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.776 48.776 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" /><path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z" /></svg>);
 
 export const TOOLS: ToolInfo[] = [
   // Organize & Modify
@@ -43,6 +44,7 @@ export const TOOLS: ToolInfo[] = [
   { key: Tool.AudioConvert, title: 'Audio Converter', description: 'Convert audio files (WAV, MP3, AAC, etc.).', icon: <AudioConvertIcon />, category: ToolCategory.Convert },
   { key: Tool.VideoConvert, title: 'Video Converter', description: 'Convert video files (MP4, WEBM, GIF, etc.).', icon: <VideoConvertIcon />, category: ToolCategory.Convert },
   { key: Tool.PdfToImages, title: 'PDF to Images', description: 'Convert PDF pages to images (PNG/JPG).', icon: <PdfToImagesIcon />, category: ToolCategory.Convert },
+  { key: Tool.FileExporter, title: 'Text to File', description: 'Save raw text to a file with any extension.', icon: <FileDown />, category: ToolCategory.Convert },
   { key: Tool.ExtractText, title: 'Extract Text', description: 'Pull all text content from a PDF.', icon: <ExtractTextIcon />, category: ToolCategory.Convert },
   { key: Tool.CadConvert, title: 'CAD to PDF', description: 'Convert DXF files to PDF.', icon: <CadConvertIcon />, category: ToolCategory.Convert },
 
@@ -55,9 +57,14 @@ export const TOOLS: ToolInfo[] = [
   { key: Tool.GetMetadata, title: 'Get Metadata', description: 'View the metadata of a PDF file.', icon: <MetadataIcon />, category: ToolCategory.Annotate },
   { key: Tool.SetMetadata, title: 'Set Metadata', description: 'Update the metadata of a PDF file.', icon: <MetadataIcon />, category: ToolCategory.Annotate },
 
+  // Image Tools
+  { key: Tool.ImageEditor, title: 'Image Editor', description: 'Crop, resize, rotate, and add filters to images.', icon: <ImageEditorIcon />, category: ToolCategory.Image },
+
   // Developer Tools
   { key: Tool.DiffView, title: 'Visual Diff Viewer', description: 'Compare two text files to see the differences.', icon: <GitCompareArrows />, category: ToolCategory.Developer },
   { key: Tool.JsonFormat, title: 'JSON Formatter', description: 'Format or minify your JSON data.', icon: <Braces />, category: ToolCategory.Developer },
   { key: Tool.DataClean, title: 'Data Cleaner', description: 'Clean and transform your text data.', icon: <Sparkles />, category: ToolCategory.Developer },
   { key: Tool.ConfigConvert, title: 'Config Converter', description: 'Convert between different config file formats.', icon: <FileCog />, category: ToolCategory.Developer },
+  { key: Tool.Notepad, title: 'Offline Notepad', description: 'A multi-tab code editor that saves automatically.', icon: <Notebook />, category: ToolCategory.Developer },
+  { key: Tool.PasswordGenerator, title: 'Password Generator', description: 'Create strong, random passwords and check their strength.', icon: <KeyRound />, category: ToolCategory.Developer },
 ];
