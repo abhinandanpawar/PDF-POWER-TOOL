@@ -34,7 +34,14 @@ import DiffViewerView from './features/DiffViewerView';
 import JsonFormatterView from './features/JsonFormatterView';
 import DataCleanerView from './features/DataCleanerView';
 import ConfigConverterView from './features/ConfigConverterView';
+
 import ImageEditorView from './features/ImageEditorView';
+
+import NotepadView from './features/NotepadView';
+import ReloadPrompt from './components/ReloadPrompt';
+import PasswordGeneratorView from './features/PasswordGeneratorView';
+import FileExporterView from './features/FileExporterView';
+
 
 const App: React.FC = () => {
   const [activeTool, setActiveTool] = useState<Tool | null>(null);
@@ -72,6 +79,7 @@ const App: React.FC = () => {
       case Tool.AudioConvert: return <AudioConvertView onBack={handleGoBack} />;
       case Tool.VideoConvert: return <VideoConvertView onBack={handleGoBack} />;
       case Tool.PdfToImages: return <PdfToImagesView onBack={handleGoBack} />;
+      case Tool.FileExporter: return <FileExporterView onBack={handleGoBack} />;
       case Tool.DeletePages: return <DeletePagesView onBack={handleGoBack} />;
       case Tool.Protect: return <ProtectView onBack={handleGoBack} />;
       case Tool.RotatePages: return <RotatePagesView onBack={handleGoBack} />;
@@ -84,6 +92,8 @@ const App: React.FC = () => {
       case Tool.JsonFormat: return <JsonFormatterView onBack={handleGoBack} />;
       case Tool.DataClean: return <DataCleanerView onBack={handleGoBack} />;
       case Tool.ConfigConvert: return <ConfigConverterView onBack={handleGoBack} />;
+      case Tool.Notepad: return <NotepadView onBack={handleGoBack} />;
+      case Tool.PasswordGenerator: return <PasswordGeneratorView onBack={handleGoBack} />;
 
 
       case Tool.CadConvert: return <CadConvertView onBack={handleGoBack} />;
@@ -97,6 +107,7 @@ const App: React.FC = () => {
     <div className="min-h-screen bg-background font-sans">
       <LoadingOverlay />
       <ToastContainer />
+      <ReloadPrompt />
       <header className="bg-secondary p-4 shadow-md sticky top-0 z-10 border-b border-border">
         <div className="container mx-auto max-w-6xl">
           <h1 
