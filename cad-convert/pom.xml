@@ -10,8 +10,8 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>multimedia-convert</artifactId>
-    <name>multimedia-convert</name>
+    <artifactId>cad-convert</artifactId>
+    <name>cad-convert</name>
     <packaging>jar</packaging>
 
     <dependencies>
@@ -23,11 +23,15 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
-        <!-- For easier file handling -->
         <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>2.11.0</version>
+            <groupId>net.sourceforge</groupId>
+            <artifactId>kabeja</artifactId>
+            <version>0.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.xmlgraphics</groupId>
+            <artifactId>batik-transcoder</artifactId>
+            <version>1.17</version>
         </dependency>
     </dependencies>
 

@@ -82,6 +82,13 @@ export const convertWordToPdf = async (file: File) => {
     await processFileResponse(response, outputFilename);
 };
 
+export const convertCadToPdf = async (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await fetch(`${BASE_URL}/cad-convert`, { method: 'POST', body: formData });
+    await processFileResponse(response, 'converted.pdf');
+};
+
 export const convertWordToTxt = async (file: File): Promise<string> => {
     const formData = new FormData();
     formData.append('file', file);
