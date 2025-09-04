@@ -1,6 +1,6 @@
 import React from 'react';
 import { Tool, ToolInfo, ToolCategory } from './types';
-import { GitCompareArrows, Braces, Sparkles, FileCog } from 'lucide-react';
+import { GitCompareArrows, Braces, Sparkles, FileCog, QrCode, FileText, Gift, Award, User, Contact, LayoutTemplate, ArrowRightLeft, Quote, Milestone, GitFork, UserCircle, Heart, Smile, Badge } from 'lucide-react';
 
 // Icon components
 const MergeIcon = () => (<svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 9.75h16.5m-16.5 4.5h16.5m-16.5 4.5h16.5M3.75 6.75h16.5" /></svg>);
@@ -60,4 +60,21 @@ export const TOOLS: ToolInfo[] = [
   { key: Tool.JsonFormat, title: 'JSON Formatter', description: 'Format or minify your JSON data.', icon: <Braces />, category: ToolCategory.Developer },
   { key: Tool.DataClean, title: 'Data Cleaner', description: 'Clean and transform your text data.', icon: <Sparkles />, category: ToolCategory.Developer },
   { key: Tool.ConfigConvert, title: 'Config Converter', description: 'Convert between different config file formats.', icon: <FileCog />, category: ToolCategory.Developer },
+  { key: Tool.CsvJsonConverter, title: 'CSV <> JSON Converter', description: 'Convert between CSV and JSON formats.', icon: <ArrowRightLeft />, category: ToolCategory.Developer },
+
+  // Creative Tools
+  { key: Tool.QrCodeGenerator, title: 'QR Code Generator', description: 'Generate a QR code from a URL or text.', icon: <QrCode />, category: ToolCategory.Creative },
+  { key: Tool.BasicInvoicePdf, title: 'Basic Invoice PDF', description: 'Create a basic invoice and download it as a PDF.', icon: <FileText />, category: ToolCategory.Creative },
+  { key: Tool.InvitationCard, title: 'Invitation Card', description: 'Design a custom invitation card.', icon: <Gift />, category: ToolCategory.Creative },
+  { key: Tool.CertificateMaker, title: 'Certificate Maker', description: 'Create a custom certificate.', icon: <Award />, category: ToolCategory.Creative },
+  { key: Tool.ResumeBuilder, title: 'Resume Builder', description: 'Create a professional resume from a form.', icon: <User />, category: ToolCategory.Creative },
+  { key: Tool.BusinessCard, title: 'Business Card Maker', description: 'Design a two-sided business card.', icon: <Contact />, category: ToolCategory.Creative },
+  { key: Tool.PosterFlyerDesign, title: 'Poster/Flyer Design', description: 'Design a poster or flyer with text and images.', icon: <LayoutTemplate />, category: ToolCategory.Creative },
+  { key: Tool.QuoteImageCreator, title: 'Quote Image Creator', description: 'Create an image with a quote.', icon: <Quote />, category: ToolCategory.Creative },
+  { key: Tool.TimelineRoadmapBuilder, title: 'Timeline/Roadmap Builder', description: 'Create a timeline with draggable milestones.', icon: <Milestone />, category: ToolCategory.Creative },
+  { key: Tool.MindMapGenerator, title: 'Mind Map Generator', description: 'Create a mind map with a force-directed graph.', icon: <GitFork />, category: ToolCategory.Creative },
+  { key: Tool.AvatarGenerator, title: 'Avatar Generator', description: 'Generate a random avatar.', icon: <UserCircle />, category: ToolCategory.Creative },
+  { key: Tool.FaviconGenerator, title: 'Favicon Generator', description: 'Generate a favicon from text.', icon: <Heart />, category: ToolCategory.Creative },
+  { key: Tool.MemeMaker, title: 'Meme Maker', description: 'Create a meme with top and bottom text.', icon: <Smile />, category: ToolCategory.Creative },
+  { key: Tool.BadgeIdCardMaker, title: 'Badge/ID Card Maker', description: 'Create a badge or ID card.', icon: <Badge />, category: ToolCategory.Creative },
 ];

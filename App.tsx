@@ -34,6 +34,23 @@ import DiffViewerView from './features/DiffViewerView';
 import JsonFormatterView from './features/JsonFormatterView';
 import DataCleanerView from './features/DataCleanerView';
 import ConfigConverterView from './features/ConfigConverterView';
+import CsvJsonConverterView from './features/CsvJsonConverterView';
+
+// Creative Tools
+import QrCodeGeneratorView from './features/QrCodeGeneratorView';
+import BasicInvoicePdfView from './features/BasicInvoicePdfView';
+import InvitationCardView from './features/InvitationCardView';
+import CertificateMakerView from './features/CertificateMakerView';
+import ResumeBuilderView from './features/ResumeBuilderView';
+import BusinessCardView from './features/BusinessCardView';
+import PosterFlyerDesignView from './features/PosterFlyerDesignView';
+import QuoteImageCreatorView from './features/QuoteImageCreatorView';
+import TimelineRoadmapBuilderView from './features/TimelineRoadmapBuilderView';
+import MindMapGeneratorView from './features/MindMapGeneratorView';
+import AvatarGeneratorView from './features/AvatarGeneratorView';
+import FaviconGeneratorView from './features/FaviconGeneratorView';
+import MemeMakerView from './features/MemeMakerView';
+import BadgeIdCardMakerView from './features/BadgeIdCardMakerView';
 
 const App: React.FC = () => {
   const [activeTool, setActiveTool] = useState<Tool | null>(null);
@@ -83,7 +100,23 @@ const App: React.FC = () => {
       case Tool.JsonFormat: return <JsonFormatterView onBack={handleGoBack} />;
       case Tool.DataClean: return <DataCleanerView onBack={handleGoBack} />;
       case Tool.ConfigConvert: return <ConfigConverterView onBack={handleGoBack} />;
+      case Tool.CsvJsonConverter: return <CsvJsonConverterView onBack={handleGoBack} />;
 
+      // Creative Tools
+      case Tool.QrCodeGenerator: return <QrCodeGeneratorView onBack={handleGoBack} />;
+      case Tool.BasicInvoicePdf: return <BasicInvoicePdfView onBack={handleGoBack} />;
+      case Tool.InvitationCard: return <InvitationCardView onBack={handleGoBack} />;
+      case Tool.CertificateMaker: return <CertificateMakerView onBack={handleGoBack} />;
+      case Tool.ResumeBuilder: return <ResumeBuilderView onBack={handleGoBack} />;
+      case Tool.BusinessCard: return <BusinessCardView onBack={handleGoBack} />;
+      case Tool.PosterFlyerDesign: return <PosterFlyerDesignView onBack={handleGoBack} />;
+      case Tool.QuoteImageCreator: return <QuoteImageCreatorView onBack={handleGoBack} />;
+      case Tool.TimelineRoadmapBuilder: return <TimelineRoadmapBuilderView onBack={handleGoBack} />;
+      case Tool.MindMapGenerator: return <MindMapGeneratorView onBack={handleGoBack} />;
+      case Tool.AvatarGenerator: return <AvatarGeneratorView onBack={handleGoBack} />;
+      case Tool.FaviconGenerator: return <FaviconGeneratorView onBack={handleGoBack} />;
+      case Tool.MemeMaker: return <MemeMakerView onBack={handleGoBack} />;
+      case Tool.BadgeIdCardMaker: return <BadgeIdCardMakerView onBack={handleGoBack} />;
 
       case Tool.CadConvert: return <CadConvertView onBack={handleGoBack} />;
 

@@ -27,9 +27,25 @@ export enum Tool {
   JsonFormat = 'json-format',
   DataClean = 'data-clean',
   ConfigConvert = 'config-convert',
+  CsvJsonConverter = 'csv-json-converter',
 
   CadConvert = 'cad-convert',
 
+  // Creative Tools
+  QrCodeGenerator = 'qr-code-generator',
+  BasicInvoicePdf = 'basic-invoice-pdf',
+  InvitationCard = 'invitation-card',
+  CertificateMaker = 'certificate-maker',
+  ResumeBuilder = 'resume-builder',
+  BusinessCard = 'business-card',
+  PosterFlyerDesign = 'poster-flyer-design',
+  QuoteImageCreator = 'quote-image-creator',
+  TimelineRoadmapBuilder = 'timeline-roadmap-builder',
+  MindMapGenerator = 'mind-map-generator',
+  AvatarGenerator = 'avatar-generator',
+  FaviconGenerator = 'favicon-generator',
+  MemeMaker = 'meme-maker',
+  BadgeIdCardMaker = 'badge-id-card-maker',
 }
 
 export enum ToolCategory {
@@ -38,6 +54,7 @@ export enum ToolCategory {
   Optimize = 'Optimize & Secure',
   Annotate = 'Annotate & Metadata',
   Developer = 'Developer Tools',
+  Creative = 'Creative Tools',
 }
 
 export interface ToolInfo {
