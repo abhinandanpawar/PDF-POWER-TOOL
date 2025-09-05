@@ -7,7 +7,7 @@ import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
-import com.example.spreadsheetconvert.util.ToHtml;
+import com.example.spreadsheetconvert.HtmlConverter;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -19,11 +19,12 @@ public class SpreadsheetConvertService {
     // --- XLS/XLSX to HTML/PDF ---
 
     public String convertXlsToHtml(InputStream inputStream, String originalFilename) throws Exception {
-        StringWriter stringWriter = new StringWriter();
-        ToHtml toHtml = ToHtml.create(inputStream, stringWriter);
-        toHtml.setCompleteHTML(true);
-        toHtml.printPage();
-        return stringWriter.toString();
+        Workbook wb = WorkbookFactory.create(inputStream);
+        StringWriter sw = new StringWriter();
+        HtmlConverter converter = HtmlConverter.create(wb, sw);
+        converter.setCompleteHTML(true);
+        converter.printPage();
+        return sw.toString();
     }
 
     public byte[] convertXlsToPdf(InputStream inputStream, String originalFilename) throws Exception {

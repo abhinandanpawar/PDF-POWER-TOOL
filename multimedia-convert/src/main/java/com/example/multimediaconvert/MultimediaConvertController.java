@@ -43,7 +43,7 @@ public class MultimediaConvertController {
         if (!ALLOWED_VIDEO_FORMATS.contains(format.toLowerCase())) {
             return ResponseEntity.badRequest().build();
         }
-        return processConversion(file, format, false);
+        return processConversion(file, format, false, null);
     }
 
     private ResponseEntity<byte[]> processConversion(MultipartFile file, String format, boolean isAudio, Integer audioBitrate) {
@@ -69,9 +69,15 @@ public class MultimediaConvertController {
         if ("wav".equalsIgnoreCase(format)) mimeType = "audio/wav";
         if ("flac".equalsIgnoreCase(format)) mimeType = "audio/flac";
         if ("ogg".equalsIgnoreCase(format)) mimeType = "audio/ogg";
+        if ("aac".equalsIgnoreCase(format)) mimeType = "audio/aac";
+        if ("aiff".equalsIgnoreCase(format)) mimeType = "audio/aiff";
+        if ("m4a".equalsIgnoreCase(format)) mimeType = "audio/mp4";
         if ("mp4".equalsIgnoreCase(format)) mimeType = "video/mp4";
         if ("webm".equalsIgnoreCase(format)) mimeType = "video/webm";
         if ("gif".equalsIgnoreCase(format)) mimeType = "image/gif";
+        if ("mov".equalsIgnoreCase(format)) mimeType = "video/quicktime";
+        if ("avi".equalsIgnoreCase(format)) mimeType = "video/x-msvideo";
+        if ("mkv".equalsIgnoreCase(format)) mimeType = "video/x-matroska";
 
         headers.setContentType(MediaType.parseMediaType(mimeType));
 

@@ -67,7 +67,6 @@ public class MultimediaConvertService {
             fullCommand.add(FFMPEG_PATH);
             fullCommand.addAll(command);
 
-            // For testing purposes, we can check the command
             System.out.println("Executing FFmpeg command: " + String.join(" ", fullCommand));
 
             ProcessBuilder processBuilder = new ProcessBuilder(fullCommand);
