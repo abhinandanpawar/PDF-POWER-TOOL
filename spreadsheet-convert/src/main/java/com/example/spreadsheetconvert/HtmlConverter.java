@@ -1,36 +1,16 @@
-/* ====================================================================
-   Licensed to the Apache Software Foundation (ASF) under one or more
-   contributor license agreements.  See the NOTICE file distributed with
-   this work for additional information regarding copyright ownership.
-   The ASF licenses this file to You under the Apache License, Version 2.0
-   (the "License"); you may not use this file except in compliance with
-   the License.  You may obtain a copy of the License at
+package com.example.spreadsheetconvert;
 
-       http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-==================================================================== */
-package com.example.spreadsheetconvert.util;
-
-import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFFont;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.format.CellFormat;
 import org.apache.poi.ss.format.CellFormatResult;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.BufferedReader;
 import java.io.Closeable;
-import java.io.FileInputStream;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.Writer;
 import java.util.Formatter;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -38,18 +18,10 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+public class HtmlConverter {
 
-
-/**
- * This example shows how to display a spreadsheet in HTML using the classes for
- * spreadsheet display.
- *
- * @author Ken Arnold, Industrious Media LLC
- */
-public class ToHtml {
     private final Workbook wb;
-    private final Appendable output;
+    private final Writer output;
     private boolean completeHTML;
     private Formatter out;
     private boolean gotBounds;
@@ -90,63 +62,14 @@ public class ToHtml {
             BorderStyle.THICK, "solid 3pt",
             BorderStyle.THIN, "dashed 1pt");
 
-    @SuppressWarnings({"unchecked"})
-    private static <K, V> Map<K, V> mapFor(Object... mapping) {
-        Map<K, V> map = new HashMap<K, V>();
-        for (int i = 0; i < mapping.length; i += 2) {
-            map.put((K) mapping[i], (V) mapping[i + 1]);
-        }
-        return map;
-    }
-
-    /**
-     * Creates a new converter to HTML for the given workbook.
-     *
-     * @param wb     The workbook.
-     * @param output Where the HTML output will be written.
-     * @return An object for converting the workbook to HTML.
-     */
-    public static ToHtml create(Workbook wb, Appendable output) {
-        return new ToHtml(wb, output);
-    }
-
-    /**
-     * Creates a new converter to HTML for the given workbook. If the path ends
-     * with "<tt>.xlsx</tt>" an {@link XSSFWorkbook} will be used; otherwise
-     * this will use an {@link HSSFWorkbook}.
-     *
-     * @param path   The file that has the workbook.
-     * @param output Where the HTML output will be written.
-     * @return An object for converting the workbook to HTML.
-     */
-    public static ToHtml create(String path, Appendable output)
-            throws IOException {
-        return create(new FileInputStream(path), output);
-    }
-
-    /**
-     * Creates a new converter to HTML for the given workbook. This attempts to
-     * detect whether the input is XML (so it should create an {@link
-     * XSSFWorkbook} or not (so it should create an {@link HSSFWorkbook}).
-     *
-     * @param in     The input stream that has the workbook.
-     * @param output Where the HTML output will be written.
-     * @return An object for converting the workbook to HTML.
-     */
-    public static ToHtml create(InputStream in, Appendable output)
-            throws IOException {
-        Workbook wb = WorkbookFactory.create(in);
-        return create(wb, output);
-    }
-
-    private ToHtml(Workbook wb, Appendable output) {
-        if (wb == null)
-            throw new NullPointerException("wb");
-        if (output == null)
-            throw new NullPointerException("output");
+    private HtmlConverter(Workbook wb, Writer output) {
         this.wb = wb;
         this.output = output;
         setupColorMap();
+    }
+
+    public static HtmlConverter create(Workbook wb, Writer output) {
+        return new HtmlConverter(wb, output);
     }
 
     private void setupColorMap() {
@@ -159,21 +82,13 @@ public class ToHtml {
                     "unknown workbook type: " + wb.getClass().getSimpleName());
     }
 
-    /**
-     * Run this class as a program
-     *
-     * @param args The command line arguments.
-     * @throws Exception Exception we don't recover from.
-     */
-    public static void main(String[] args) throws Exception {
-        if (args.length < 2) {
-            System.err.println("usage: ToHtml inputWorkbook outputHtmlFile");
-            return;
+    @SuppressWarnings({"unchecked"})
+    private static <K, V> Map<K, V> mapFor(Object... mapping) {
+        Map<K, V> map = new HashMap<K, V>();
+        for (int i = 0; i < mapping.length; i += 2) {
+            map.put((K) mapping[i], (V) mapping[i + 1]);
         }
-
-        ToHtml toHtml = create(args[0], new PrintWriter(new FileWriter(args[1])));
-        toHtml.setCompleteHTML(true);
-        toHtml.printPage();
+        return map;
     }
 
     public void setCompleteHTML(boolean completeHTML) {
@@ -214,7 +129,6 @@ public class ToHtml {
     }
 
     private void printInlineStyle() {
-        //out.format("<link href=\"excelStyle.css\" rel=\"stylesheet\" type=\"text/css\">%n");
         out.format("<style type=\"text/css\">%n");
         printStyles();
         out.format("</style>%n");
@@ -228,35 +142,20 @@ public class ToHtml {
     public void printStyles() {
         ensureOut();
 
-        // First, copy the base css
-        BufferedReader in = null;
-        try {
-            in = new BufferedReader(new InputStreamReader(
-                    getClass().getResourceAsStream("/com/example/spreadsheetconvert/util/excelStyle.css")));
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(
+                getClass().getResourceAsStream("/com/example/spreadsheetconvert/excelStyle.css")))) {
             String line;
             while ((line = in.readLine()) != null) {
                 out.format("%s%n", line);
             }
         } catch (IOException e) {
             throw new IllegalStateException("Reading standard css", e);
-        } finally {
-            if (in != null) {
-                try {
-                    in.close();
-                } catch (IOException e) {
-                    //noinspection ThrowFromFinallyBlock
-                    throw new IllegalStateException("Reading standard css", e);
-                }
-            }
         }
 
-        // now add css for each used style
-        Set<CellStyle> seen = new HashSet<CellStyle>();
+        Set<CellStyle> seen = new HashSet<>();
         for (int i = 0; i < wb.getNumberOfSheets(); i++) {
             Sheet sheet = wb.getSheetAt(i);
-            Iterator<Row> rows = sheet.rowIterator();
-            while (rows.hasNext()) {
-                Row row = rows.next();
+            for (Row row : sheet) {
                 for (Cell cell : row) {
                     CellStyle style = cell.getCellStyle();
                     if (!seen.contains(style)) {
@@ -299,12 +198,9 @@ public class ToHtml {
 
         int fontheight = font.getFontHeightInPoints();
         if (fontheight == 9) {
-            //fix for stupid ol Windows
             fontheight = 10;
         }
         out.format("  font-size: %dpt;%n", fontheight);
-
-        // Font color is handled with the other colors
     }
 
     private String styleName(CellStyle style) {
@@ -374,7 +270,6 @@ public class ToHtml {
         out.format("<thead>%n");
         out.format("  <tr class=%s>%n", COL_HEAD_CLASS);
         out.format("    <th class=%s>&#x25CA;</th>%n", COL_HEAD_CLASS);
-        //noinspection UnusedDeclaration
         StringBuilder colName = new StringBuilder();
         for (int i = firstColumn; i < endColumn; i++) {
             colName.setLength(0);
@@ -410,8 +305,6 @@ public class ToHtml {
 
                         style = cell.getCellStyle();
                         attrs = tagStyle(cell, style);
-                        //Set the value that is rendered for the cell
-                        //also applies the format
                         CellFormat cf = CellFormat.getInstance(
                                 style.getDataFormatString());
                         CellFormatResult result = cf.apply(cell);
@@ -438,7 +331,6 @@ public class ToHtml {
                     return "style=\"text-align: center;\"";
                 case NUMERIC:
                 default:
-                    // "right" is the default
                     break;
             }
         }

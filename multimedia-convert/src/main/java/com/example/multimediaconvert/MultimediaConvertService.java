@@ -20,14 +20,15 @@ public class MultimediaConvertService {
 
     private static final String FFMPEG_PATH = "ffmpeg"; // Assuming ffmpeg is in the system's PATH
 
-    public byte[] convertAudio(InputStream inputStream, String outputFormat) throws IOException, InterruptedException {
+    public byte[] convertAudio(InputStream inputStream, String outputFormat, Integer audioBitrate) throws IOException, InterruptedException {
         List<String> command = new ArrayList<>();
         command.add("-i");
         command.add("input"); // Placeholder for input file
         command.add("-y"); // Overwrite output file if it exists
-        // Add specific audio options if needed, e.g., bitrate
-        // command.add("-b:a");
-        // command.add("192k");
+        if (audioBitrate != null) {
+            command.add("-b:a");
+            command.add(audioBitrate + "k");
+        }
         command.add("output." + outputFormat); // Placeholder for output file
 
         return executeFfmpeg(inputStream, command, outputFormat);
@@ -65,6 +66,8 @@ public class MultimediaConvertService {
             List<String> fullCommand = new ArrayList<>();
             fullCommand.add(FFMPEG_PATH);
             fullCommand.addAll(command);
+
+            System.out.println("Executing FFmpeg command: " + String.join(" ", fullCommand));
 
             ProcessBuilder processBuilder = new ProcessBuilder(fullCommand);
             processBuilder.directory(tempDir.toFile()); // Run ffmpeg in the temp directory

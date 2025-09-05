@@ -4,7 +4,7 @@ import FileUpload from '../components/FileUpload';
 import { convertVideo } from '../services/apiService';
 import { useToolLogic } from '../hooks/useToolLogic';
 
-type VideoFormat = 'mp4' | 'webm' | 'gif';
+type VideoFormat = 'mp4' | 'webm' | 'gif' | 'mov' | 'avi' | 'mkv';
 
 const VideoConvertView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const [outputFormat, setOutputFormat] = useState<VideoFormat>('mp4');
@@ -46,6 +46,9 @@ const VideoConvertView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                 <option value="mp4">MP4</option>
                 <option value="webm">WEBM</option>
                 <option value="gif">GIF</option>
+                <option value="mov">MOV</option>
+                <option value="avi">AVI</option>
+                <option value="mkv">MKV</option>
             </select>
         </div>
 

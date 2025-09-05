@@ -16,8 +16,8 @@ public class MultimediaConvertController {
 
     private final MultimediaConvertService multimediaConvertService;
 
-    private static final List<String> ALLOWED_AUDIO_FORMATS = Arrays.asList("mp3", "wav", "flac", "ogg");
-    private static final List<String> ALLOWED_VIDEO_FORMATS = Arrays.asList("mp4", "webm", "gif");
+    private static final List<String> ALLOWED_AUDIO_FORMATS = Arrays.asList("mp3", "wav", "flac", "ogg", "aac", "aiff", "m4a");
+    private static final List<String> ALLOWED_VIDEO_FORMATS = Arrays.asList("mp4", "webm", "gif", "mov", "avi", "mkv");
 
     public MultimediaConvertController(MultimediaConvertService multimediaConvertService) {
         this.multimediaConvertService = multimediaConvertService;
@@ -26,12 +26,13 @@ public class MultimediaConvertController {
     @PostMapping("/audio")
     public ResponseEntity<byte[]> convertAudio(
             @RequestParam("file") MultipartFile file,
-            @RequestParam("format") String format) {
+            @RequestParam("format") String format,
+            @RequestParam(value = "audioBitrate", required = false) Integer audioBitrate) {
 
         if (!ALLOWED_AUDIO_FORMATS.contains(format.toLowerCase())) {
             return ResponseEntity.badRequest().build();
         }
-        return processConversion(file, format, true);
+        return processConversion(file, format, true, audioBitrate);
     }
 
     @PostMapping("/video")
@@ -42,16 +43,16 @@ public class MultimediaConvertController {
         if (!ALLOWED_VIDEO_FORMATS.contains(format.toLowerCase())) {
             return ResponseEntity.badRequest().build();
         }
-        return processConversion(file, format, false);
+        return processConversion(file, format, false, null);
     }
 
-    private ResponseEntity<byte[]> processConversion(MultipartFile file, String format, boolean isAudio) {
+    private ResponseEntity<byte[]> processConversion(MultipartFile file, String format, boolean isAudio, Integer audioBitrate) {
         if (file.isEmpty()) {
             return ResponseEntity.badRequest().build();
         }
         try {
             byte[] resultBytes = isAudio
-                ? multimediaConvertService.convertAudio(file.getInputStream(), format)
+                ? multimediaConvertService.convertAudio(file.getInputStream(), format, audioBitrate)
                 : multimediaConvertService.convertVideo(file.getInputStream(), format);
 
             return createResponse(resultBytes, format, file.getOriginalFilename());
@@ -68,9 +69,15 @@ public class MultimediaConvertController {
         if ("wav".equalsIgnoreCase(format)) mimeType = "audio/wav";
         if ("flac".equalsIgnoreCase(format)) mimeType = "audio/flac";
         if ("ogg".equalsIgnoreCase(format)) mimeType = "audio/ogg";
+        if ("aac".equalsIgnoreCase(format)) mimeType = "audio/aac";
+        if ("aiff".equalsIgnoreCase(format)) mimeType = "audio/aiff";
+        if ("m4a".equalsIgnoreCase(format)) mimeType = "audio/mp4";
         if ("mp4".equalsIgnoreCase(format)) mimeType = "video/mp4";
         if ("webm".equalsIgnoreCase(format)) mimeType = "video/webm";
         if ("gif".equalsIgnoreCase(format)) mimeType = "image/gif";
+        if ("mov".equalsIgnoreCase(format)) mimeType = "video/quicktime";
+        if ("avi".equalsIgnoreCase(format)) mimeType = "video/x-msvideo";
+        if ("mkv".equalsIgnoreCase(format)) mimeType = "video/x-matroska";
 
         headers.setContentType(MediaType.parseMediaType(mimeType));
 
