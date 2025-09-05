@@ -52,14 +52,13 @@ public class MultimediaConvertService {
         return executeFfmpeg(inputStream, command, outputFormat);
     }
 
-    private byte[] executeFfmpeg(InputStream inputStream, List<String> command, String outputFormat) throws IOException, InterruptedException {
+    protected byte[] executeFfmpeg(InputStream inputStream, List<String> command, String outputFormat) throws IOException, InterruptedException {
         Path tempDir = null;
         try {
             tempDir = Files.createTempDirectory("ffmpeg-work-" + UUID.randomUUID());
             File inputFile = tempDir.resolve("input").toFile();
             FileUtils.copyInputStreamToFile(inputStream, inputFile);
 
-            // Update command with actual file paths
             command.set(command.indexOf("input"), inputFile.getAbsolutePath());
             command.set(command.indexOf("output." + outputFormat), tempDir.resolve("output." + outputFormat).toString());
 
@@ -69,13 +68,8 @@ public class MultimediaConvertService {
 
             System.out.println("Executing FFmpeg command: " + String.join(" ", fullCommand));
 
-            ProcessBuilder processBuilder = new ProcessBuilder(fullCommand);
-            processBuilder.directory(tempDir.toFile()); // Run ffmpeg in the temp directory
-            processBuilder.redirectErrorStream(true);
+            Process process = buildAndStartProcess(fullCommand, tempDir.toFile());
 
-            Process process = processBuilder.start();
-
-            // It's crucial to consume the process output to prevent blocking
             StringBuilder output = new StringBuilder();
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
                 String line;
@@ -84,7 +78,7 @@ public class MultimediaConvertService {
                 }
             }
 
-            boolean finished = process.waitFor(1, TimeUnit.MINUTES); // 1 minute timeout
+            boolean finished = process.waitFor(1, TimeUnit.MINUTES);
             if (!finished) {
                 process.destroy();
                 throw new IOException("FFmpeg process timed out.");
@@ -101,5 +95,12 @@ public class MultimediaConvertService {
                 FileUtils.deleteDirectory(tempDir.toFile());
             }
         }
+    }
+
+    protected Process buildAndStartProcess(List<String> command, File directory) throws IOException {
+        ProcessBuilder processBuilder = new ProcessBuilder(command);
+        processBuilder.directory(directory);
+        processBuilder.redirectErrorStream(true);
+        return processBuilder.start();
     }
 }
