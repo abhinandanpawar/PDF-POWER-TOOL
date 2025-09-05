@@ -41,7 +41,7 @@
         <module>markdown-convert</module>
         <module>ppt-convert</module>
         <module>spreadsheet-convert</module>
-        <module>cad-convert</module>
+        
 
     </modules>
 

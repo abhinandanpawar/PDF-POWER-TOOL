@@ -1,46 +1,32 @@
-import React, { useState } from 'react';
+import React from 'react';
 import ToolPageLayout from '../components/ToolPageLayout';
 import FileUpload from '../components/FileUpload';
 import { convertCsvXlsx } from '../services/apiService';
-import { useToasts } from '../hooks/useToasts';
-import { useLoading } from '../hooks/useLoading';
+import { useToolLogic } from '../hooks/useToolLogic';
 
 const CsvXlsxView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
-  const [files, setFiles] = useState<File[]>([]);
-  const { addToast } = useToasts();
-  const { showLoading, hideLoading } = useLoading();
+  const { files, setFiles, handleProcess } = useToolLogic({
+    conversionFunction: (files) => convertCsvXlsx(files[0]),
+    successMessage: 'Converted successfully! Your download has started.',
+    errorMessage: 'Failed to convert file',
+    validate: (files) => {
+      if (files.length === 0) {
+        return 'Please select a CSV or XLSX file to convert.';
+      }
+      if (files.length > 1) {
+        return 'Please select only one file.';
+      }
 
-  const handleConvert = async () => {
-    if (files.length === 0) {
-      addToast('error', 'Please select a CSV or XLSX file to convert.');
-      return;
-    }
-    if (files.length > 1) {
-        addToast('error', 'Please select only one file.');
-        return;
-    }
+      const inputFile = files[0];
+      const isCsv = inputFile.name.toLowerCase().endsWith('.csv');
+      const isXlsx = inputFile.name.toLowerCase().endsWith('.xlsx');
 
-    const inputFile = files[0];
-    const isCsv = inputFile.name.toLowerCase().endsWith('.csv');
-    const isXlsx = inputFile.name.toLowerCase().endsWith('.xlsx');
-
-    if (!isCsv && !isXlsx) {
-        addToast('error', 'Please upload a valid .csv or .xlsx file.');
-        return;
-    }
-
-    showLoading();
-    try {
-      await convertCsvXlsx(inputFile);
-      setFiles([]);
-      const direction = isCsv ? 'CSV to XLSX' : 'XLSX to CSV';
-      addToast('success', `Converted ${direction} successfully! Your download has started.`);
-    } catch (e) {
-      addToast('error', (e as Error).message);
-    } finally {
-      hideLoading();
-    }
-  };
+      if (!isCsv && !isXlsx) {
+          return 'Please upload a valid .csv or .xlsx file.';
+      }
+      return null;
+    },
+  });
 
   return (
     <ToolPageLayout
@@ -51,7 +37,7 @@ const CsvXlsxView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       <div className="space-y-6">
         <FileUpload files={files} setFiles={setFiles} />
         <button
-          onClick={handleConvert}
+          onClick={() => handleProcess()}
           disabled={files.length === 0}
           className="w-full bg-primary text-white font-bold py-3 px-4 rounded-lg hover:bg-primary-hover disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors"
         >

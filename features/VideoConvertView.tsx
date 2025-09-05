@@ -2,38 +2,27 @@ import React, { useState } from 'react';
 import ToolPageLayout from '../components/ToolPageLayout';
 import FileUpload from '../components/FileUpload';
 import { convertVideo } from '../services/apiService';
-import { useToasts } from '../hooks/useToasts';
-import { useLoading } from '../hooks/useLoading';
+import { useToolLogic } from '../hooks/useToolLogic';
 
 type VideoFormat = 'mp4' | 'webm' | 'gif';
 
 const VideoConvertView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
-  const [files, setFiles] = useState<File[]>([]);
   const [outputFormat, setOutputFormat] = useState<VideoFormat>('mp4');
-  const { addToast } = useToasts();
-  const { showLoading, hideLoading } = useLoading();
 
-  const handleConvert = async () => {
-    if (files.length === 0) {
-      addToast('error', 'Please select a video file to convert.');
-      return;
-    }
-    if (files.length > 1) {
-        addToast('error', 'Please select only one file.');
-        return;
-    }
-
-    showLoading();
-    try {
-      await convertVideo(files[0], outputFormat);
-      setFiles([]);
-      addToast('success', `Converted to ${outputFormat.toUpperCase()} successfully! Your download has started.`);
-    } catch (e) {
-      addToast('error', (e as Error).message);
-    } finally {
-      hideLoading();
-    }
-  };
+  const { files, setFiles, handleProcess } = useToolLogic({
+    conversionFunction: (files, options) => convertVideo(files[0], options?.outputFormat as VideoFormat),
+    successMessage: `Converted to ${outputFormat.toUpperCase()} successfully! Your download has started.`,
+    errorMessage: 'Failed to convert video',
+    validate: (files) => {
+      if (files.length === 0) {
+        return 'Please select a video file to convert.';
+      }
+      if (files.length > 1) {
+        return 'Please select only one file.';
+      }
+      return null;
+    },
+  });
 
   return (
     <ToolPageLayout
@@ -61,7 +50,7 @@ const VideoConvertView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         </div>
 
         <button
-          onClick={handleConvert}
+          onClick={() => handleProcess({ outputFormat })}
           disabled={files.length === 0}
           className="w-full bg-primary text-white font-bold py-3 px-4 rounded-lg hover:bg-primary-hover disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors"
         >

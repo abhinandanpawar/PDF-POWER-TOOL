@@ -11,14 +11,14 @@ export default {
   theme: {
     extend: {
       colors: {
-        'primary': '#6d28d9',
-        'primary-hover': '#5b21b6',
-        'secondary': '#1f2937',
-        'background': '#111827',
-        'card': '#1f2937',
-        'text-primary': '#f9fafb',
-        'text-secondary': '#d1d5db',
-        'border': '#374151',
+        'primary': '#000000', // Black
+        'primary-hover': '#1a1a1a', // Very dark gray
+        'secondary': '#ffffff', // White
+        'background': '#000000', // Black
+        'card': '#1a1a1a', // Dark gray for cards
+        'text-primary': '#ffffff', // White for main text
+        'text-secondary': '#a0a0a0', // Light gray for secondary text
+        'border': '#404040', // Medium gray for borders
       },
       keyframes: {
         fadeIn: {

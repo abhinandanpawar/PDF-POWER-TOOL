@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import ToolPageLayout from '../components/ToolPageLayout';
 import { useToasts } from '../hooks/useToasts';
-import { fabric } from 'fabric';
+import { Canvas, IText, Image } from 'fabric';
+import FileUpload from '../components/FileUpload';
 import { useDropzone } from 'react-dropzone';
 
 const PosterFlyerDesignView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
@@ -11,7 +12,7 @@ const PosterFlyerDesignView: React.FC<{ onBack: () => void }> = ({ onBack }) => 
 
   useEffect(() => {
     if (canvasRef.current) {
-      const canvas = new fabric.Canvas(canvasRef.current, {
+      const canvas = new Canvas(canvasRef.current, {
         width: 800,
         height: 600,
         backgroundColor: '#fff',
@@ -26,7 +27,7 @@ const PosterFlyerDesignView: React.FC<{ onBack: () => void }> = ({ onBack }) => 
   const addText = () => {
     const canvas = fabricCanvasRef.current;
     if (canvas) {
-      const text = new fabric.IText('Editable Text', {
+      const text = new IText('Editable Text', {
         left: 100,
         top: 100,
         fontFamily: 'Arial',
@@ -37,15 +38,17 @@ const PosterFlyerDesignView: React.FC<{ onBack: () => void }> = ({ onBack }) => 
     }
   };
 
-  const onDrop = (acceptedFiles: File[]) => {
-    if (acceptedFiles.length > 0) {
-      const file = acceptedFiles[0];
+  const [imageFile, setImageFile] = useState<File[]>([]);
+
+  useEffect(() => {
+    if (imageFile.length > 0 && fabricCanvasRef.current) {
+      const file = imageFile[0];
       const reader = new FileReader();
       reader.onload = (e) => {
         const imgElement = document.createElement('img');
         imgElement.src = e.target?.result as string;
         imgElement.onload = () => {
-          const imgInstance = new fabric.Image(imgElement, {
+          const imgInstance = new Image(imgElement, {
             left: 150,
             top: 150,
             scaleX: 0.5,
@@ -56,9 +59,7 @@ const PosterFlyerDesignView: React.FC<{ onBack: () => void }> = ({ onBack }) => 
       };
       reader.readAsDataURL(file);
     }
-  };
-
-  const { getRootProps, getInputProps } = useDropzone({ onDrop, accept: { 'image/*': [] } });
+  }, [imageFile]);
 
   const handleExport = () => {
     const canvas = fabricCanvasRef.current;
@@ -86,10 +87,7 @@ const PosterFlyerDesignView: React.FC<{ onBack: () => void }> = ({ onBack }) => 
           <button onClick={addText} className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
             Add Text
           </button>
-          <div {...getRootProps()} className="p-4 border-2 border-dashed rounded-md text-center cursor-pointer">
-            <input {...getInputProps()} />
-            <p>Add Image</p>
-          </div>
+          <FileUpload files={imageFile} setFiles={setImageFile} accept="image/*" multiple={false} />
           <button onClick={handleExport} className="w-full px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
             Export as PNG
           </button>

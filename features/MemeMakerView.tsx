@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import ToolPageLayout from '../components/ToolPageLayout';
 import { useToasts } from '../hooks/useToasts';
+import FileUpload from '../components/FileUpload';
 import { useDropzone } from 'react-dropzone';
 
 const MemeMakerView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
@@ -51,9 +52,11 @@ const MemeMakerView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     drawCanvas();
   }, [topText, bottomText, image]);
 
-  const onDrop = (acceptedFiles: File[]) => {
-    if (acceptedFiles.length > 0) {
-      const file = acceptedFiles[0];
+  const [imageFile, setImageFile] = useState<File[]>([]);
+
+  useEffect(() => {
+    if (imageFile.length > 0) {
+      const file = imageFile[0];
       const reader = new FileReader();
       reader.onload = () => {
         const img = new Image();
@@ -62,9 +65,7 @@ const MemeMakerView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       };
       reader.readAsDataURL(file);
     }
-  };
-
-  const { getRootProps, getInputProps } = useDropzone({ onDrop, accept: { 'image/*': [] } });
+  }, [imageFile]);
 
   const handleDownload = () => {
     const canvas = canvasRef.current;
@@ -88,10 +89,7 @@ const MemeMakerView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     >
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="md:col-span-1 space-y-4">
-          <div {...getRootProps()} className="p-6 border-2 border-dashed rounded-md text-center cursor-pointer">
-            <input {...getInputProps()} />
-            <p>Upload Image</p>
-          </div>
+          <FileUpload files={imageFile} setFiles={setImageFile} accept="image/*" multiple={false} />
           <input
             type="text"
             value={topText}

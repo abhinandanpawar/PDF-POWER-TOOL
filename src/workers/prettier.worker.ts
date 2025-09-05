@@ -2,7 +2,7 @@ import prettier from 'prettier/standalone';
 import * as prettierPluginBabel from "prettier/plugins/babel";
 import * as prettierPluginEstree from "prettier/plugins/estree";
 import * as prettierPluginHtml from "prettier/plugins/html";
-import * as prettierPluginCss from "prettier/plugins/css";
+import * as prettierPluginPostcss from "prettier/plugins/postcss";
 
 self.onmessage = async (event) => {
   const {
@@ -29,7 +29,7 @@ self.onmessage = async (event) => {
         break;
       case 'css':
         parser = 'css';
-        plugins = [prettierPluginCss];
+        plugins = [prettierPluginPostcss];
         break;
       default:
         throw new Error(`Unsupported language for formatting: ${language}`);

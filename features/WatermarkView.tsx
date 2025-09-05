@@ -2,32 +2,22 @@ import React, { useState } from 'react';
 import ToolPageLayout from '../components/ToolPageLayout';
 import FileUpload from '../components/FileUpload';
 import { addWatermark } from '../services/apiService';
-import { useToasts } from '../hooks/useToasts';
-import { useLoading } from '../hooks/useLoading';
+import { useToolLogic } from '../hooks/useToolLogic';
 
 const WatermarkView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
-  const [files, setFiles] = useState<File[]>([]);
   const [text, setText] = useState('');
-  const { addToast } = useToasts();
-  const { showLoading, hideLoading } = useLoading();
 
-  const handleWatermark = async () => {
-    if (files.length === 0 || !text.trim()) {
-      addToast('error', 'Please select files and provide watermark text.');
-      return;
-    }
-    showLoading();
-    try {
-      await addWatermark(files, text);
-      setFiles([]);
-      setText('');
-      addToast('success', 'Watermark added successfully! Your download has started.');
-    } catch (e) {
-      addToast('error', (e as Error).message);
-    } finally {
-      hideLoading();
-    }
-  };
+  const { files, setFiles, handleProcess } = useToolLogic({
+    conversionFunction: (files, options) => addWatermark(files, options?.text as string),
+    successMessage: 'Watermark added successfully! Your download has started.',
+    errorMessage: 'Failed to add watermark',
+    validate: (files) => {
+      if (files.length === 0 || !text.trim()) {
+        return 'Please select files and provide watermark text.';
+      }
+      return null;
+    },
+  });
 
   return (
     <ToolPageLayout
@@ -52,7 +42,7 @@ const WatermarkView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           />
         </div>
         <button
-          onClick={handleWatermark}
+          onClick={() => handleProcess({ text })}
           disabled={files.length === 0 || !text.trim()}
           className="w-full bg-primary text-white font-bold py-3 px-4 rounded-lg hover:bg-primary-hover disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors"
         >

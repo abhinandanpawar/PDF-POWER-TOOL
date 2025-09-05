@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react';
 import Cropper from 'react-easy-crop';
 import { RotateCcw, RotateCw, FlipHorizontal, FlipVertical } from 'lucide-react';
 import ToolPageLayout from '../components/ToolPageLayout';
-import { Button } from '../components/Button';
+import Button from '../components/Button';
 import { Dropzone } from '../components/Dropzone';
 import { Steps } from '../components/Steps';
 import { getCroppedImg, resizeImage, transformImage } from './imageUtils';
@@ -53,10 +53,6 @@ const ImageEditorView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
         setAspectRatio(img.width / img.height);
       };
-
-      };
-
-
       setCurrentStep(1);
     };
     reader.readAsDataURL(file);
@@ -122,28 +118,8 @@ const ImageEditorView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     }
   };
 
-  const handleDimensionChange = (e: React.ChangeEvent<HTMLInputElement>, dimension: 'width' | 'height') => {
-    const value = parseInt(e.target.value);
-    if (isNaN(value) || value < 0) {
-      if (dimension === 'width') setWidth(0);
-      else setHeight(0);
-      return;
-    }
-
-    if (dimension === 'width') {
-      setWidth(value);
-      if (lockAspectRatio) {
-        setHeight(Math.round(value / aspectRatio));
-      }
-    } else {
-      setHeight(value);
-      if (lockAspectRatio) {
-        setWidth(Math.round(value * aspectRatio));
-      }
-    }
-  };
-
-  const handleResize = async () => {
+  
+    const handleResize = async () => {
     if (!croppedImage) return;
     const resized = await resizeImage(croppedImage, width, height);
     setResizedImage(resized);
@@ -194,7 +170,6 @@ const ImageEditorView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       case 1:
         return (
           <div className="relative h-[400px]">
-
             <div
               className="absolute inset-0"
               style={{
@@ -214,23 +189,13 @@ const ImageEditorView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                 onCropComplete={onCropComplete}
               />
             </div>
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center space-x-2">
+            <div className="absolute bottom-16 left-1/2 -translate-x-1/2 flex items-center space-x-2">
               <Button onClick={() => handleRotate(-90)} aria-label="Rotate Left"><RotateCcw /></Button>
               <Button onClick={() => handleRotate(90)} aria-label="Rotate Right"><RotateCw /></Button>
               <Button onClick={() => handleFlip('horizontal')} aria-label="Flip Horizontal"><FlipHorizontal /></Button>
               <Button onClick={() => handleFlip('vertical')} aria-label="Flip Vertical"><FlipVertical /></Button>
-
-            <Cropper
-              image={image}
-              crop={crop}
-              zoom={zoom}
-              aspect={originalWidth / originalHeight || 1}
-              onCropChange={setCrop}
-              onZoomChange={setZoom}
-              onCropComplete={onCropComplete}
-            />
+            </div>
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2">
-
               <Button onClick={showCroppedImage}>Crop Image</Button>
             </div>
           </div>

@@ -1,9 +1,7 @@
 import React from 'react';
 import { Tool, ToolInfo, ToolCategory } from './types';
 
-import { GitCompareArrows, Braces, Sparkles, FileCog, QrCode, FileText, Gift, Award, User, Contact, LayoutTemplate, ArrowRightLeft, Quote, Milestone, GitFork, UserCircle, Heart, Smile, Badge } from 'lucide-react';
-
-import { GitCompareArrows, Braces, Sparkles, FileCog, Notebook, KeyRound, FileDown } from 'lucide-react';
+import { GitCompareArrows, Braces, Sparkles, FileCog, QrCode, FileText, Gift, Award, User, Contact, LayoutTemplate, ArrowRightLeft, Quote, Milestone, GitFork, UserCircle, Heart, Smile, Badge, Notebook, KeyRound, FileDown } from 'lucide-react';
 
 
 // Icon components

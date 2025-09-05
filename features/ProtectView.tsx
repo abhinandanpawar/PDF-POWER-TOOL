@@ -2,32 +2,22 @@ import React, { useState } from 'react';
 import ToolPageLayout from '../components/ToolPageLayout';
 import FileUpload from '../components/FileUpload';
 import { protectPdf } from '../services/apiService';
-import { useToasts } from '../hooks/useToasts';
-import { useLoading } from '../hooks/useLoading';
+import { useToolLogic } from '../hooks/useToolLogic';
 
 const ProtectView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
-  const [files, setFiles] = useState<File[]>([]);
   const [password, setPassword] = useState('');
-  const { addToast } = useToasts();
-  const { showLoading, hideLoading } = useLoading();
 
-  const handleProtect = async () => {
-    if (files.length === 0 || !password) {
-      addToast('error', 'Please select files and enter a password.');
-      return;
-    }
-    showLoading();
-    try {
-      await protectPdf(files, password);
-      setFiles([]);
-      setPassword('');
-      addToast('success', 'PDFs protected successfully! Your download has started.');
-    } catch (e) {
-      addToast('error', (e as Error).message);
-    } finally {
-      hideLoading();
-    }
-  };
+  const { files, setFiles, handleProcess } = useToolLogic({
+    conversionFunction: (files, options) => protectPdf(files, options?.password as string),
+    successMessage: 'PDFs protected successfully! Your download has started.',
+    errorMessage: 'Failed to protect PDFs',
+    validate: (files) => {
+      if (files.length === 0 || !password) {
+        return 'Please select files and enter a password.';
+      }
+      return null;
+    },
+  });
 
   return (
     <ToolPageLayout
@@ -52,7 +42,7 @@ const ProtectView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           />
         </div>
         <button
-          onClick={handleProtect}
+          onClick={() => handleProcess({ password })}
           disabled={files.length === 0 || !password}
           className="w-full bg-primary text-white font-bold py-3 px-4 rounded-lg hover:bg-primary-hover disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors"
         >

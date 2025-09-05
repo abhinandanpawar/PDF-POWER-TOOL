@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import ToolPageLayout from '../components/ToolPageLayout';
 import { useToasts } from '../hooks/useToasts';
-import toIco from 'to-ico';
+import { PngIcoConverter } from '../src/lib/png2ico.js';
 
 const FaviconGeneratorView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const { addToast } = useToasts();
@@ -33,28 +33,29 @@ const FaviconGeneratorView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   }, [text, bgColor, textColor]);
 
   const handleDownload = async () => {
-    const sizes = [16, 32, 48];
-    const images: ImageData[] = [];
+    const size = 48;
+    const canvas = document.createElement('canvas');
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
 
-    for (const size of sizes) {
-      const canvas = document.createElement('canvas');
-      canvas.width = size;
-      canvas.height = size;
-      const ctx = canvas.getContext('2d');
-      if (ctx) {
-        ctx.fillStyle = bgColor;
-        ctx.fillRect(0, 0, size, size);
-        ctx.fillStyle = textColor;
-        ctx.font = `bold ${size * 0.7}px Arial`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(text.slice(0, 2), size / 2, size / 2);
-        images.push(ctx.getImageData(0, 0, size, size));
-      }
-    }
+    ctx.fillStyle = bgColor;
+    ctx.fillRect(0, 0, size, size);
+    ctx.fillStyle = textColor;
+    ctx.font = `bold ${size * 0.7}px Arial`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(text.slice(0, 2), size / 2, size / 2);
+    
+    const dataUrl = canvas.toDataURL('image/png');
+    const res = await fetch(dataUrl);
+    const buffer = await res.arrayBuffer();
+    const png = new Uint8Array(buffer);
 
     try {
-      const icoBuffer = await toIco(images.map(imgData => new Uint8Array(imgData.data.buffer)));
+      const converter = new PngIcoConverter();
+      const icoBuffer = await converter.convert(png);
       const blob = new Blob([icoBuffer], { type: 'image/x-icon' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');

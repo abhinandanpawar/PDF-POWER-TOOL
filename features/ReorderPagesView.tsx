@@ -2,37 +2,25 @@ import React, { useState } from 'react';
 import ToolPageLayout from '../components/ToolPageLayout';
 import FileUpload from '../components/FileUpload';
 import { reorderPages } from '../services/apiService';
-import { useToasts } from '../hooks/useToasts';
-import { useLoading } from '../hooks/useLoading';
+import { useToolLogic } from '../hooks/useToolLogic';
 
 const ReorderPagesView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
-  const [files, setFiles] = useState<File[]>([]);
   const [order, setOrder] = useState('');
-  const { addToast } = useToasts();
-  const { showLoading, hideLoading } = useLoading();
 
-  const handleReorder = async () => {
-    if (files.length !== 1) {
-      addToast('error', 'Please select exactly one file to reorder.');
-      return;
-    }
-    if (!order.trim()) {
-      addToast('error', 'Please specify the new page order.');
-      return;
-    }
-    
-    showLoading();
-    try {
-      await reorderPages(files, order);
-      setFiles([]);
-      setOrder('');
-      addToast('success', 'Pages reordered successfully! Your download has started.');
-    } catch (e) {
-      addToast('error', (e as Error).message);
-    } finally {
-      hideLoading();
-    }
-  };
+  const { files, setFiles, handleProcess } = useToolLogic({
+    conversionFunction: (files, options) => reorderPages(files, options?.order as string),
+    successMessage: 'Pages reordered successfully! Your download has started.',
+    errorMessage: 'Failed to reorder pages',
+    validate: (files) => {
+      if (files.length !== 1) {
+        return 'Please select exactly one file to reorder.';
+      }
+      if (!order.trim()) {
+        return 'Please specify the new page order.';
+      }
+      return null;
+    },
+  });
 
   return (
     <ToolPageLayout
@@ -57,7 +45,7 @@ const ReorderPagesView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           />
         </div>
         <button
-          onClick={handleReorder}
+          onClick={() => handleProcess({ order })}
           disabled={files.length !== 1 || !order.trim()}
           className="w-full bg-primary text-white font-bold py-3 px-4 rounded-lg hover:bg-primary-hover disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors"
         >

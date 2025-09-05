@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import ToolPageLayout from '../components/ToolPageLayout';
 import { useToasts } from '../hooks/useToasts';
+import FileUpload from '../components/FileUpload';
 import { useDropzone } from 'react-dropzone';
 
 const QuoteImageCreatorView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
@@ -71,9 +72,11 @@ const QuoteImageCreatorView: React.FC<{ onBack: () => void }> = ({ onBack }) => 
     drawCanvas();
   }, [quote, backgroundImage, font, fontSize, textColor]);
 
-  const onDrop = (acceptedFiles: File[]) => {
-    if (acceptedFiles.length > 0) {
-      const file = acceptedFiles[0];
+  const [backgroundImageFile, setBackgroundImageFile] = useState<File[]>([]);
+
+  useEffect(() => {
+    if (backgroundImageFile.length > 0) {
+      const file = backgroundImageFile[0];
       const reader = new FileReader();
       reader.onload = () => {
         const img = new Image();
@@ -82,9 +85,7 @@ const QuoteImageCreatorView: React.FC<{ onBack: () => void }> = ({ onBack }) => 
       };
       reader.readAsDataURL(file);
     }
-  };
-
-  const { getRootProps, getInputProps } = useDropzone({ onDrop, accept: { 'image/*': [] } });
+  }, [backgroundImageFile]);
 
   const handleDownload = () => {
     const canvas = canvasRef.current;
@@ -120,10 +121,7 @@ const QuoteImageCreatorView: React.FC<{ onBack: () => void }> = ({ onBack }) => 
             <input type="number" value={fontSize} onChange={e => setFontSize(parseInt(e.target.value))} className="w-full p-2 border rounded" />
             <input type="color" value={textColor} onChange={e => setTextColor(e.target.value)} className="p-1 h-10 w-10 border rounded" />
           </div>
-          <div {...getRootProps()} className="p-4 border-2 border-dashed rounded-md text-center cursor-pointer">
-            <input {...getInputProps()} />
-            <p>Set background image</p>
-          </div>
+          <FileUpload files={backgroundImageFile} setFiles={setBackgroundImageFile} accept="image/*" multiple={false} />
           <button onClick={handleDownload} className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
             Download Image
           </button>

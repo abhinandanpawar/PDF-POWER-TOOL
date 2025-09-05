@@ -1,33 +1,24 @@
-import React, { useState } from 'react';
+import React from 'react';
 import ToolPageLayout from '../components/ToolPageLayout';
 import FileUpload from '../components/FileUpload';
 import { extractText } from '../services/apiService';
+import { useToolLogic } from '../hooks/useToolLogic';
 import { useToasts } from '../hooks/useToasts';
-import { useLoading } from '../hooks/useLoading';
 
 const ExtractTextView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
-  const [files, setFiles] = useState<File[]>([]);
-  const [extractedText, setExtractedText] = useState<string | null>(null);
-  const { addToast } = useToasts();
-  const { showLoading, hideLoading } = useLoading();
+  const { files, setFiles, handleProcess, result: extractedText } = useToolLogic<undefined, string>({
+    conversionFunction: extractText,
+    successMessage: 'Text extracted successfully!',
+    errorMessage: 'Failed to extract text',
+    validate: (files) => {
+      if (files.length === 0) {
+        return 'Please select files to extract text from.';
+      }
+      return null;
+    },
+  });
 
-  const handleExtract = async () => {
-    if (files.length === 0) {
-      addToast('error', 'Please select files to extract text from.');
-      return;
-    }
-    showLoading();
-    setExtractedText(null);
-    try {
-      const text = await extractText(files);
-      setExtractedText(text);
-      addToast('success', 'Text extracted successfully!');
-    } catch (e) {
-      addToast('error', (e as Error).message);
-    } finally {
-      hideLoading();
-    }
-  };
+  const { addToast } = useToasts();
 
   const handleCopyToClipboard = () => {
     if (extractedText) {
@@ -45,7 +36,7 @@ const ExtractTextView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       <div className="space-y-6">
         <FileUpload files={files} setFiles={setFiles} />
         <button
-          onClick={handleExtract}
+          onClick={() => handleProcess()}
           disabled={files.length === 0}
           className="w-full bg-primary text-white font-bold py-3 px-4 rounded-lg hover:bg-primary-hover disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors"
         >

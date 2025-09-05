@@ -46,7 +46,7 @@ import BusinessCardView from './features/BusinessCardView';
 import PosterFlyerDesignView from './features/PosterFlyerDesignView';
 import QuoteImageCreatorView from './features/QuoteImageCreatorView';
 import TimelineRoadmapBuilderView from './features/TimelineRoadmapBuilderView';
-import MindMapGeneratorView from './features/MindMapGeneratorView';
+
 import AvatarGeneratorView from './features/AvatarGeneratorView';
 import FaviconGeneratorView from './features/FaviconGeneratorView';
 import MemeMakerView from './features/MemeMakerView';
@@ -126,7 +126,7 @@ const App: React.FC = () => {
       case Tool.PosterFlyerDesign: return <PosterFlyerDesignView onBack={handleGoBack} />;
       case Tool.QuoteImageCreator: return <QuoteImageCreatorView onBack={handleGoBack} />;
       case Tool.TimelineRoadmapBuilder: return <TimelineRoadmapBuilderView onBack={handleGoBack} />;
-      case Tool.MindMapGenerator: return <MindMapGeneratorView onBack={handleGoBack} />;
+      
       case Tool.AvatarGenerator: return <AvatarGeneratorView onBack={handleGoBack} />;
       case Tool.FaviconGenerator: return <FaviconGeneratorView onBack={handleGoBack} />;
       case Tool.MemeMaker: return <MemeMakerView onBack={handleGoBack} />;
@@ -144,10 +144,10 @@ const App: React.FC = () => {
       <LoadingOverlay />
       <ToastContainer />
       <ReloadPrompt />
-      <header className="bg-secondary p-4 shadow-md sticky top-0 z-10 border-b border-border">
+      <header className="bg-secondary p-4 sticky top-0 z-10 border-b border-border">
         <div className="container mx-auto max-w-6xl">
           <h1 
-            className="text-2xl font-bold text-white cursor-pointer"
+            className="text-2xl font-bold text-black cursor-pointer"
             onClick={handleGoBack}
             role="button"
             tabIndex={0}

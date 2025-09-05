@@ -52,7 +52,6 @@ export enum Tool {
   Notepad = 'notepad',
   PasswordGenerator = 'password-generator',
 
-  CadConvert = 'cad-convert',
   ImageEditor = 'image-editor',
 
 }

@@ -1,13 +1,14 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { EditorState, Compartment } from '@codemirror/state';
 import { EditorView, keymap, lineNumbers, highlightActiveLineGutter, highlightSpecialChars, drawSelection, dropCursor, rectangularSelection, crosshairCursor, highlightActiveLine } from '@codemirror/view';
-import { defaultKeymap, historyKeymap, foldKeymap, indentWithTab } from '@codemirror/commands';
+import { defaultKeymap, historyKeymap, indentWithTab } from '@codemirror/commands';
+import { foldKeymap } from '@codemirror/fold';
 import { history } from '@codemirror/commands';
 import { foldGutter, indentOnInput, bracketMatching } from '@codemirror/language';
 import { autocompletion, completionKeymap, closeBrackets, closeBracketsKeymap } from '@codemirror/autocomplete';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { search, searchKeymap } from '@codemirror/search';
-import { secretScannerPlugin } from '../editor-extensions/secret-scanner';
+import { secretScannerPlugin } from '../src/editor-extensions/secret-scanner';
 
 // Language Support
 import { javascript } from '@codemirror/lang-javascript';

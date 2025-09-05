@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import ToolPageLayout from '../components/ToolPageLayout';
 import { useToasts } from '../hooks/useToasts';
+import FileUpload from '../components/FileUpload';
 import { useDropzone } from 'react-dropzone';
 import QRCode from 'qrcode';
 
@@ -65,9 +66,11 @@ const BadgeIdCardMakerView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     drawCanvas();
   }, [name, title, company, photo, qrCodeUrl]);
 
-  const onDrop = (acceptedFiles: File[]) => {
-    if (acceptedFiles.length > 0) {
-      const file = acceptedFiles[0];
+  const [photoFile, setPhotoFile] = useState<File[]>([]);
+
+  useEffect(() => {
+    if (photoFile.length > 0) {
+      const file = photoFile[0];
       const reader = new FileReader();
       reader.onload = () => {
         const img = new Image();
@@ -76,9 +79,7 @@ const BadgeIdCardMakerView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       };
       reader.readAsDataURL(file);
     }
-  };
-
-  const { getRootProps, getInputProps } = useDropzone({ onDrop, accept: { 'image/*': [] } });
+  }, [photoFile]);
 
   const handleDownload = () => {
     const canvas = canvasRef.current;
@@ -99,10 +100,7 @@ const BadgeIdCardMakerView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     >
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="md:col-span-1 space-y-4">
-          <div {...getRootProps()} className="p-6 border-2 border-dashed rounded-md text-center cursor-pointer">
-            <input {...getInputProps()} />
-            <p>Upload Photo</p>
-          </div>
+          <FileUpload files={photoFile} setFiles={setPhotoFile} accept="image/*" multiple={false} />
           <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="Name" className="w-full p-2 border rounded" />
           <input type="text" value={title} onChange={e => setTitle(e.target.value)} placeholder="Title" className="w-full p-2 border rounded" />
           <input type="text" value={company} onChange={e => setCompany(e.target.value)} placeholder="Company" className="w-full p-2 border rounded" />

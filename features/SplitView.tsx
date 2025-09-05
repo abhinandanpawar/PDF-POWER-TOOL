@@ -2,32 +2,22 @@ import React, { useState } from 'react';
 import ToolPageLayout from '../components/ToolPageLayout';
 import FileUpload from '../components/FileUpload';
 import { splitPdf } from '../services/apiService';
-import { useToasts } from '../hooks/useToasts';
-import { useLoading } from '../hooks/useLoading';
+import { useToolLogic } from '../hooks/useToolLogic';
 
 const SplitView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
-  const [files, setFiles] = useState<File[]>([]);
   const [ranges, setRanges] = useState('');
-  const { addToast } = useToasts();
-  const { showLoading, hideLoading } = useLoading();
 
-  const handleSplit = async () => {
-    if (files.length === 0) {
-      addToast('error', 'Please select at least one PDF file to split.');
-      return;
-    }
-    showLoading();
-    try {
-      await splitPdf(files, ranges);
-      setFiles([]);
-      setRanges('');
-      addToast('success', 'PDF split successfully! Your download has started.');
-    } catch (e) {
-      addToast('error', (e as Error).message);
-    } finally {
-      hideLoading();
-    }
-  };
+  const { files, setFiles, handleProcess } = useToolLogic({
+    conversionFunction: (files, options) => splitPdf(files, options?.ranges as string),
+    successMessage: 'PDF split successfully! Your download has started.',
+    errorMessage: 'Failed to split PDF',
+    validate: (files) => {
+      if (files.length === 0) {
+        return 'Please select at least one PDF file to split.';
+      }
+      return null;
+    },
+  });
 
   return (
     <ToolPageLayout
@@ -51,7 +41,7 @@ const SplitView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           />
         </div>
         <button
-          onClick={handleSplit}
+          onClick={() => handleProcess({ ranges })}
           disabled={files.length === 0}
           className="w-full bg-primary text-white font-bold py-3 px-4 rounded-lg hover:bg-primary-hover disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors"
         >

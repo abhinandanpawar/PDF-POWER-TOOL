@@ -18,7 +18,7 @@ const ToolPageLayout: React.FC<ToolPageLayoutProps> = ({ title, description, onB
       </button>
       <div className="bg-card p-6 sm:p-8 rounded-lg shadow-2xl border border-border">
         <header className="mb-8">
-            <h2 className="text-3xl font-bold text-white">{title}</h2>
+            <h2 className="text-3xl font-bold text-text-primary">{title}</h2>
             <p className="text-text-secondary mt-1">{description}</p>
         </header>
         <main>

@@ -35,4 +35,12 @@
         </dependency>
     </dependencies>
 
+    <repositories>
+        <repository>
+            <id>openkm-repo</id>
+            <name>OpenKM Repository</name>
+            <url>https://maven.openkm.com/</url>
+        </repository>
+    </repositories>
+
 </project>

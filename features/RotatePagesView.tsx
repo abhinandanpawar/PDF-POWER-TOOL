@@ -2,33 +2,23 @@ import React, { useState } from 'react';
 import ToolPageLayout from '../components/ToolPageLayout';
 import FileUpload from '../components/FileUpload';
 import { rotatePages } from '../services/apiService';
-import { useToasts } from '../hooks/useToasts';
-import { useLoading } from '../hooks/useLoading';
+import { useToolLogic } from '../hooks/useToolLogic';
 
 const RotatePagesView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
-  const [files, setFiles] = useState<File[]>([]);
   const [pages, setPages] = useState('');
   const [degrees, setDegrees] = useState<90 | 180 | 270>(90);
-  const { addToast } = useToasts();
-  const { showLoading, hideLoading } = useLoading();
 
-  const handleRotate = async () => {
-    if (files.length === 0 || !pages.trim()) {
-      addToast('error', 'Please select files and specify pages to rotate.');
-      return;
-    }
-    showLoading();
-    try {
-      await rotatePages(files, pages, degrees);
-      setFiles([]);
-      setPages('');
-      addToast('success', 'Pages rotated successfully! Your download has started.');
-    } catch (e) {
-      addToast('error', (e as Error).message);
-    } finally {
-      hideLoading();
-    }
-  };
+  const { files, setFiles, handleProcess } = useToolLogic({
+    conversionFunction: (files, options) => rotatePages(files, options?.pages as string, options?.degrees as (90 | 180 | 270)),
+    successMessage: 'Pages rotated successfully! Your download has started.',
+    errorMessage: 'Failed to rotate pages',
+    validate: (files) => {
+      if (files.length === 0 || !pages.trim()) {
+        return 'Please select files and specify pages to rotate.';
+      }
+      return null;
+    },
+  });
 
   return (
     <ToolPageLayout
@@ -70,7 +60,7 @@ const RotatePagesView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
             </div>
         </div>
         <button
-          onClick={handleRotate}
+          onClick={() => handleProcess({ pages, degrees })}
           disabled={files.length === 0 || !pages.trim()}
           className="w-full bg-primary text-white font-bold py-3 px-4 rounded-lg hover:bg-primary-hover disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors"
         >

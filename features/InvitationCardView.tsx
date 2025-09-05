@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import ToolPageLayout from '../components/ToolPageLayout';
 import { useToasts } from '../hooks/useToasts';
+import FileUpload from '../components/FileUpload';
 import { useDropzone } from 'react-dropzone';
 
 const InvitationCardView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
@@ -46,9 +47,11 @@ const InvitationCardView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     drawCanvas();
   }, [title, message, details, backgroundImage]);
 
-  const onDrop = (acceptedFiles: File[]) => {
-    if (acceptedFiles.length > 0) {
-      const file = acceptedFiles[0];
+  const [backgroundImageFile, setBackgroundImageFile] = useState<File[]>([]);
+
+  useEffect(() => {
+    if (backgroundImageFile.length > 0) {
+      const file = backgroundImageFile[0];
       const reader = new FileReader();
       reader.onload = () => {
         const img = new Image();
@@ -60,9 +63,7 @@ const InvitationCardView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       };
       reader.readAsDataURL(file);
     }
-  };
-
-  const { getRootProps, getInputProps } = useDropzone({ onDrop, accept: { 'image/*': [] } });
+  }, [backgroundImageFile]);
 
   const handleDownload = () => {
     const canvas = canvasRef.current;
@@ -87,10 +88,7 @@ const InvitationCardView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           <textarea value={message} onChange={e => setMessage(e.target.value)} className="w-full p-2 border rounded" rows={3}></textarea>
           <input type="text" value={details} onChange={e => setDetails(e.target.value)} className="w-full p-2 border rounded" />
 
-          <div {...getRootProps()} className="p-6 border-2 border-dashed rounded-md text-center cursor-pointer">
-            <input {...getInputProps()} />
-            <p>Drag 'n' drop a background image here, or click to select one.</p>
-          </div>
+          <FileUpload files={backgroundImageFile} setFiles={setBackgroundImageFile} accept="image/*" multiple={false} />
 
           <button onClick={handleDownload} className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
             Download Card

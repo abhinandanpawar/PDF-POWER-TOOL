@@ -2,32 +2,22 @@ import React, { useState } from 'react';
 import ToolPageLayout from '../components/ToolPageLayout';
 import FileUpload from '../components/FileUpload';
 import { deletePages } from '../services/apiService';
-import { useToasts } from '../hooks/useToasts';
-import { useLoading } from '../hooks/useLoading';
+import { useToolLogic } from '../hooks/useToolLogic';
 
 const DeletePagesView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
-  const [files, setFiles] = useState<File[]>([]);
   const [pages, setPages] = useState('');
-  const { addToast } = useToasts();
-  const { showLoading, hideLoading } = useLoading();
 
-  const handleDelete = async () => {
-    if (files.length === 0 || !pages.trim()) {
-      addToast('error', 'Please select files and specify pages to delete.');
-      return;
-    }
-    showLoading();
-    try {
-      await deletePages(files, pages);
-      setFiles([]);
-      setPages('');
-      addToast('success', 'Pages deleted successfully! Your download has started.');
-    } catch (e) {
-      addToast('error', (e as Error).message);
-    } finally {
-      hideLoading();
-    }
-  };
+  const { files, setFiles, handleProcess } = useToolLogic({
+    conversionFunction: (files, options) => deletePages(files, options?.pages as string),
+    successMessage: 'Pages deleted successfully! Your download has started.',
+    errorMessage: 'Failed to delete pages',
+    validate: (files) => {
+      if (files.length === 0 || !pages.trim()) {
+        return 'Please select files and specify pages to delete.';
+      }
+      return null;
+    },
+  });
 
   return (
     <ToolPageLayout
@@ -52,7 +42,7 @@ const DeletePagesView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           />
         </div>
         <button
-          onClick={handleDelete}
+          onClick={() => handleProcess({ pages })}
           disabled={files.length === 0 || !pages.trim()}
           className="w-full bg-primary text-white font-bold py-3 px-4 rounded-lg hover:bg-primary-hover disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors"
         >
