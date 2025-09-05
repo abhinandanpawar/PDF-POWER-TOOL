@@ -4,13 +4,14 @@ import FileUpload from '../components/FileUpload';
 import { convertAudio } from '../services/apiService';
 import { useToolLogic } from '../hooks/useToolLogic';
 
-type AudioFormat = 'mp3' | 'wav' | 'flac' | 'ogg';
+type AudioFormat = 'mp3' | 'wav' | 'flac' | 'ogg' | 'aac' | 'aiff' | 'm4a';
 
 const AudioConvertView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const [outputFormat, setOutputFormat] = useState<AudioFormat>('mp3');
+  const [audioBitrate, setAudioBitrate] = useState(192);
 
   const { files, setFiles, handleProcess } = useToolLogic({
-    conversionFunction: (files, options) => convertAudio(files[0], options?.outputFormat as AudioFormat),
+    conversionFunction: (files, options) => convertAudio(files[0], options?.outputFormat as AudioFormat, options?.audioBitrate),
     successMessage: `Converted to ${outputFormat.toUpperCase()} successfully! Your download has started.`,
     errorMessage: 'Failed to convert audio',
     validate: (files) => {
@@ -47,11 +48,30 @@ const AudioConvertView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                 <option value="wav">WAV</option>
                 <option value="flac">FLAC</option>
                 <option value="ogg">OGG</option>
+                <option value="aac">AAC</option>
+                <option value="aiff">AIFF</option>
+                <option value="m4a">M4A</option>
             </select>
         </div>
 
+        <div className="flex flex-col space-y-2">
+            <label htmlFor="bitrate-slider" className="font-medium text-text-primary">
+                Audio Bitrate: {audioBitrate} kbps
+            </label>
+            <input
+                id="bitrate-slider"
+                type="range"
+                min="64"
+                max="320"
+                step="32"
+                value={audioBitrate}
+                onChange={(e) => setAudioBitrate(Number(e.target.value))}
+                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+            />
+        </div>
+
         <button
-          onClick={() => handleProcess({ outputFormat })}
+          onClick={() => handleProcess({ outputFormat, audioBitrate })}
           disabled={files.length === 0}
           className="w-full bg-primary text-white font-bold py-3 px-4 rounded-lg hover:bg-primary-hover disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors"
         >

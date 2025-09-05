@@ -16,8 +16,8 @@ public class MultimediaConvertController {
 
     private final MultimediaConvertService multimediaConvertService;
 
-    private static final List<String> ALLOWED_AUDIO_FORMATS = Arrays.asList("mp3", "wav", "flac", "ogg");
-    private static final List<String> ALLOWED_VIDEO_FORMATS = Arrays.asList("mp4", "webm", "gif");
+    private static final List<String> ALLOWED_AUDIO_FORMATS = Arrays.asList("mp3", "wav", "flac", "ogg", "aac", "aiff", "m4a");
+    private static final List<String> ALLOWED_VIDEO_FORMATS = Arrays.asList("mp4", "webm", "gif", "mov", "avi", "mkv");
 
     public MultimediaConvertController(MultimediaConvertService multimediaConvertService) {
         this.multimediaConvertService = multimediaConvertService;
@@ -26,12 +26,13 @@ public class MultimediaConvertController {
     @PostMapping("/audio")
     public ResponseEntity<byte[]> convertAudio(
             @RequestParam("file") MultipartFile file,
-            @RequestParam("format") String format) {
+            @RequestParam("format") String format,
+            @RequestParam(value = "audioBitrate", required = false) Integer audioBitrate) {
 
         if (!ALLOWED_AUDIO_FORMATS.contains(format.toLowerCase())) {
             return ResponseEntity.badRequest().build();
         }
-        return processConversion(file, format, true);
+        return processConversion(file, format, true, audioBitrate);
     }
 
     @PostMapping("/video")
@@ -45,13 +46,13 @@ public class MultimediaConvertController {
         return processConversion(file, format, false);
     }
 
-    private ResponseEntity<byte[]> processConversion(MultipartFile file, String format, boolean isAudio) {
+    private ResponseEntity<byte[]> processConversion(MultipartFile file, String format, boolean isAudio, Integer audioBitrate) {
         if (file.isEmpty()) {
             return ResponseEntity.badRequest().build();
         }
         try {
             byte[] resultBytes = isAudio
-                ? multimediaConvertService.convertAudio(file.getInputStream(), format)
+                ? multimediaConvertService.convertAudio(file.getInputStream(), format, audioBitrate)
                 : multimediaConvertService.convertVideo(file.getInputStream(), format);
 
             return createResponse(resultBytes, format, file.getOriginalFilename());
