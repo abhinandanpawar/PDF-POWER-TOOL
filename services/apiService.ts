@@ -215,13 +215,10 @@ export const convertCsvXlsx = async (file: File) => {
     }
 };
 
-export const convertAudio = async (file: File, format: string, audioBitrate?: number) => {
+export const convertAudio = async (file: File, format: string) => {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('format', format);
-    if (audioBitrate) {
-        formData.append('audioBitrate', audioBitrate.toString());
-    }
     const response = await fetch(`${BASE_URL}/multimedia-convert/audio`, { method: 'POST', body: formData });
 
     let outputFilename = `converted.${format}`;
