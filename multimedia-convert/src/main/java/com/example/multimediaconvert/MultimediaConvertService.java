@@ -20,14 +20,15 @@ public class MultimediaConvertService {
 
     private static final String FFMPEG_PATH = "ffmpeg"; // Assuming ffmpeg is in the system's PATH
 
-    public byte[] convertAudio(InputStream inputStream, String outputFormat) throws IOException, InterruptedException {
+    public byte[] convertAudio(InputStream inputStream, String outputFormat, Integer audioBitrate) throws IOException, InterruptedException {
         List<String> command = new ArrayList<>();
         command.add("-i");
         command.add("input"); // Placeholder for input file
         command.add("-y"); // Overwrite output file if it exists
-        // Add specific audio options if needed, e.g., bitrate
-        // command.add("-b:a");
-        // command.add("192k");
+        if (audioBitrate != null) {
+            command.add("-b:a");
+            command.add(audioBitrate + "k");
+        }
         command.add("output." + outputFormat); // Placeholder for output file
 
         return executeFfmpeg(inputStream, command, outputFormat);
@@ -51,14 +52,13 @@ public class MultimediaConvertService {
         return executeFfmpeg(inputStream, command, outputFormat);
     }
 
-    private byte[] executeFfmpeg(InputStream inputStream, List<String> command, String outputFormat) throws IOException, InterruptedException {
+    protected byte[] executeFfmpeg(InputStream inputStream, List<String> command, String outputFormat) throws IOException, InterruptedException {
         Path tempDir = null;
         try {
             tempDir = Files.createTempDirectory("ffmpeg-work-" + UUID.randomUUID());
             File inputFile = tempDir.resolve("input").toFile();
             FileUtils.copyInputStreamToFile(inputStream, inputFile);
 
-            // Update command with actual file paths
             command.set(command.indexOf("input"), inputFile.getAbsolutePath());
             command.set(command.indexOf("output." + outputFormat), tempDir.resolve("output." + outputFormat).toString());
 
@@ -66,13 +66,10 @@ public class MultimediaConvertService {
             fullCommand.add(FFMPEG_PATH);
             fullCommand.addAll(command);
 
-            ProcessBuilder processBuilder = new ProcessBuilder(fullCommand);
-            processBuilder.directory(tempDir.toFile()); // Run ffmpeg in the temp directory
-            processBuilder.redirectErrorStream(true);
+            System.out.println("Executing FFmpeg command: " + String.join(" ", fullCommand));
 
-            Process process = processBuilder.start();
+            Process process = buildAndStartProcess(fullCommand, tempDir.toFile());
 
-            // It's crucial to consume the process output to prevent blocking
             StringBuilder output = new StringBuilder();
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
                 String line;
@@ -81,7 +78,7 @@ public class MultimediaConvertService {
                 }
             }
 
-            boolean finished = process.waitFor(1, TimeUnit.MINUTES); // 1 minute timeout
+            boolean finished = process.waitFor(1, TimeUnit.MINUTES);
             if (!finished) {
                 process.destroy();
                 throw new IOException("FFmpeg process timed out.");
@@ -98,5 +95,12 @@ public class MultimediaConvertService {
                 FileUtils.deleteDirectory(tempDir.toFile());
             }
         }
+    }
+
+    protected Process buildAndStartProcess(List<String> command, File directory) throws IOException {
+        ProcessBuilder processBuilder = new ProcessBuilder(command);
+        processBuilder.directory(directory);
+        processBuilder.redirectErrorStream(true);
+        return processBuilder.start();
     }
 }

@@ -2,10 +2,4 @@
 > pdf-power-toolbox@0.0.0 dev
 > vite
 
-
-  VITE v6.3.5  ready in 253 ms
-
-
-
-  ➜  Local:   http://localhost:5173/
-  ➜  Network: use --host to expose
+12:11:44 PM [vite] (client) Re-optimizing dependencies because lockfile has changed
