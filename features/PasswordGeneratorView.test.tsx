@@ -15,6 +15,22 @@ import {
   ToastProvider
 } from '../hooks/useToasts'; // Assuming ToastProvider is needed for context
 
+// Mock crypto.getRandomValues for the test environment
+let callCount = 0;
+const mockCrypto = {
+  getRandomValues: vi.fn((array) => {
+    callCount++;
+    // Fill the array with non-zero values for testing purposes
+    for (let i = 0; i < array.length; i++) {
+      array[i] = (i + 1) * 12345 * callCount;
+    }
+  }),
+};
+Object.defineProperty(global.self, 'crypto', {
+  value: mockCrypto,
+});
+
+
 // Mock zxcvbn to avoid its overhead in these tests
 vi.mock('zxcvbn', () => ({
   default: () => ({
@@ -38,6 +54,12 @@ const renderWithProviders = (ui: React.ReactElement) => {
 };
 
 describe('PasswordGeneratorView', () => {
+  beforeEach(() => {
+    callCount = 0;
+    mockCrypto.getRandomValues.mockClear();
+    vi.clearAllMocks();
+  });
+
   it('generates a password with the default settings', async () => {
     const {
       container
@@ -117,5 +139,18 @@ describe('PasswordGeneratorView', () => {
           const passwordDisplay = container.querySelector('.truncate');
           expect(passwordDisplay!.textContent).not.toBe(firstPassword);
       });
+  });
+
+  it('uses crypto.getRandomValues instead of Math.random', async () => {
+    const mathRandomSpy = vi.spyOn(Math, 'random');
+    const { container } = renderWithProviders(<PasswordGeneratorView onBack={() => {}} />);
+
+    await waitFor(() => {
+      const passwordDisplay = container.querySelector('.truncate');
+      expect(passwordDisplay!.textContent).not.toBe('');
+    });
+
+    expect(mathRandomSpy).not.toHaveBeenCalled();
+    mathRandomSpy.mockRestore();
   });
 });
