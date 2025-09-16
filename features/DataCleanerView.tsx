@@ -12,7 +12,7 @@ const DataCleanerView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         result = inputText.split('\n').map(line => line.trim()).join('\n');
         break;
       case 'remove-duplicates':
-        result = [...new Set(inputText.split('\n'))].join('\n');
+        result = [...new Set(inputText.split('\n').map(line => line.trim()))].join('\n');
         break;
       case 'lowercase':
         result = inputText.toLowerCase();
