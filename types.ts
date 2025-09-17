@@ -24,7 +24,6 @@ export enum Tool {
 
 
   // Developer Tools
-  DiffView = 'diff-view',
   JsonFormat = 'json-format',
   DataClean = 'data-clean',
   ConfigConvert = 'config-convert',
@@ -49,10 +48,7 @@ export enum Tool {
   MemeMaker = 'meme-maker',
   BadgeIdCardMaker = 'badge-id-card-maker',
 
-  Notepad = 'notepad',
   PasswordGenerator = 'password-generator',
-
-  ImageEditor = 'image-editor',
 
 }
 

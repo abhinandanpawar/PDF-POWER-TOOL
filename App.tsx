@@ -30,7 +30,6 @@ import SetMetadataView from './features/SetMetadataView';
 import CadConvertView from './features/CadConvertView';
 
 // Developer Tools
-import DiffViewerView from './features/DiffViewerView';
 import JsonFormatterView from './features/JsonFormatterView';
 import DataCleanerView from './features/DataCleanerView';
 import ConfigConverterView from './features/ConfigConverterView';
@@ -52,9 +51,6 @@ import FaviconGeneratorView from './features/FaviconGeneratorView';
 import MemeMakerView from './features/MemeMakerView';
 import BadgeIdCardMakerView from './features/BadgeIdCardMakerView';
 
-import ImageEditorView from './features/ImageEditorView';
-
-import NotepadView from './features/NotepadView';
 import ReloadPrompt from './components/ReloadPrompt';
 import PasswordGeneratorView from './features/PasswordGeneratorView';
 import FileExporterView from './features/FileExporterView';
@@ -105,14 +101,12 @@ const App: React.FC = () => {
       case Tool.GetMetadata: return <GetMetadataView onBack={handleGoBack} />;
       case Tool.SetMetadata: return <SetMetadataView onBack={handleGoBack} />;
       // Developer Tools
-      case Tool.DiffView: return <DiffViewerView onBack={handleGoBack} />;
       case Tool.JsonFormat: return <JsonFormatterView onBack={handleGoBack} />;
       case Tool.DataClean: return <DataCleanerView onBack={handleGoBack} />;
       case Tool.ConfigConvert: return <ConfigConverterView onBack={handleGoBack} />;
 
       case Tool.CsvJsonConverter: return <CsvJsonConverterView onBack={handleGoBack} />;
 
-      case Tool.Notepad: return <NotepadView onBack={handleGoBack} />;
       case Tool.PasswordGenerator: return <PasswordGeneratorView onBack={handleGoBack} />;
 
 
@@ -133,7 +127,6 @@ const App: React.FC = () => {
       case Tool.BadgeIdCardMaker: return <BadgeIdCardMakerView onBack={handleGoBack} />;
 
       case Tool.CadConvert: return <CadConvertView onBack={handleGoBack} />;
-      case Tool.ImageEditor: return <ImageEditorView onBack={handleGoBack} />;
 
       default: return null;
     }
