@@ -9,7 +9,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.pdfprocessor.api.PdfMetadata;
+import com.example.pdfprocessor.api.PdfMetadataService;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.io.IOException;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/pdfs/metadata")
@@ -35,8 +45,21 @@ public class MetadataController {
     @PostMapping
     public ResponseEntity<byte[]> setMetadata(
             @RequestPart("file") MultipartFile file,
-            @RequestPart("metadata") PdfMetadata metadata) {
+            @RequestPart("metadata") Map<String, String> metadataMap) {
         try {
+            PdfMetadata metadata = new PdfMetadata();
+            metadataMap.forEach((key, value) -> {
+                if ("title".equalsIgnoreCase(key)) {
+                    metadata.setTitle(value);
+                } else if ("author".equalsIgnoreCase(key)) {
+                    metadata.setAuthor(value);
+                } else if ("subject".equalsIgnoreCase(key)) {
+                    metadata.setSubject(value);
+                } else if ("keywords".equalsIgnoreCase(key)) {
+                    metadata.setKeywords(value);
+                }
+            });
+
             byte[] resultPdf = pdfMetadataService.setMetadata(file.getBytes(), metadata);
 
             HttpHeaders headers = new HttpHeaders();

@@ -8,6 +8,12 @@ interface PasswordGeneratorViewProps {
   onBack: () => void;
 }
 
+const secureRandom = (max: number) => {
+  const randomValues = new Uint32Array(1);
+  crypto.getRandomValues(randomValues);
+  return randomValues[0] % max;
+};
+
 const CHARSETS = {
   LOWERCASE: 'abcdefghijklmnopqrstuvwxyz',
   UPPERCASE: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
@@ -32,19 +38,19 @@ const PasswordGeneratorView: React.FC<PasswordGeneratorViewProps> = ({ onBack })
 
     if (includeLowercase) {
       charset += CHARSETS.LOWERCASE;
-      requiredChars.push(CHARSETS.LOWERCASE[Math.floor(Math.random() * CHARSETS.LOWERCASE.length)]);
+      requiredChars.push(CHARSETS.LOWERCASE[secureRandom(CHARSETS.LOWERCASE.length)]);
     }
     if (includeUppercase) {
       charset += CHARSETS.UPPERCASE;
-      requiredChars.push(CHARSETS.UPPERCASE[Math.floor(Math.random() * CHARSETS.UPPERCASE.length)]);
+      requiredChars.push(CHARSETS.UPPERCASE[secureRandom(CHARSETS.UPPERCASE.length)]);
     }
     if (includeNumbers) {
       charset += CHARSETS.NUMBERS;
-      requiredChars.push(CHARSETS.NUMBERS[Math.floor(Math.random() * CHARSETS.NUMBERS.length)]);
+      requiredChars.push(CHARSETS.NUMBERS[secureRandom(CHARSETS.NUMBERS.length)]);
     }
     if (includeSymbols) {
       charset += CHARSETS.SYMBOLS;
-      requiredChars.push(CHARSETS.SYMBOLS[Math.floor(Math.random() * CHARSETS.SYMBOLS.length)]);
+      requiredChars.push(CHARSETS.SYMBOLS[secureRandom(CHARSETS.SYMBOLS.length)]);
     }
 
     if (charset === '') {
@@ -65,7 +71,7 @@ const PasswordGeneratorView: React.FC<PasswordGeneratorViewProps> = ({ onBack })
 
     // Shuffle the array to mix required chars with random chars
     for (let i = newPassword.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
+        const j = secureRandom(i + 1);
         [newPassword[i], newPassword[j]] = [newPassword[j], newPassword[i]];
     }
 

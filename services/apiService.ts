@@ -316,9 +316,8 @@ export const getPdfMetadata = async (file: File): Promise<any> => {
 export const setPdfMetadata = async (file: File, metadata: { [key: string]: string }) => {
     const formData = new FormData();
     formData.append('file', file);
-    Object.entries(metadata).forEach(([key, value]) => {
-        formData.append(`metadata[${key}]`, value);
-    });
-    const response = await fetch(`${BASE_URL}/metadata/set`, { method: 'POST', body: formData });
+    const metadataBlob = new Blob([JSON.stringify(metadata)], { type: 'application/json' });
+    formData.append('metadata', metadataBlob);
+    const response = await fetch(`${BASE_URL}/pdfs/metadata`, { method: 'POST', body: formData });
     await processFileResponse(response, 'metadata_updated.pdf');
 };
