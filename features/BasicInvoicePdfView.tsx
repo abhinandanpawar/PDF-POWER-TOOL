@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import ToolPageLayout from '../components/ToolPageLayout';
 import { useToasts } from '../hooks/useToasts';
 import jsPDF from 'jspdf';
@@ -18,6 +18,8 @@ const BasicInvoicePdfView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const [invoiceNumber, setInvoiceNumber] = useState('');
   const [invoiceDate, setInvoiceDate] = useState(new Date().toISOString().split('T')[0]);
   const [items, setItems] = useState<InvoiceItem[]>([{ description: '', quantity: 1, price: 0 }]);
+  const [tax, setTax] = useState(0);
+  const [discount, setDiscount] = useState(0);
 
   const handleItemChange = (index: number, field: keyof InvoiceItem, value: string | number) => {
     const newItems = [...items];
@@ -33,6 +35,13 @@ const BasicInvoicePdfView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     const newItems = items.filter((_, i) => i !== index);
     setItems(newItems);
   };
+
+  const { subtotal, taxAmount, total } = useMemo(() => {
+    const subtotal = items.reduce((acc, item) => acc + item.quantity * item.price, 0);
+    const taxAmount = subtotal * (tax / 100);
+    const total = subtotal + taxAmount - discount;
+    return { subtotal, taxAmount, total };
+  }, [items, tax, discount]);
 
   const handleGeneratePdf = () => {
     try {
@@ -63,10 +72,8 @@ const BasicInvoicePdfView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       y += 7;
       doc.line(20, y - 5, 190, y - 5);
 
-      let total = 0;
       items.forEach(item => {
         const itemTotal = item.quantity * item.price;
-        total += itemTotal;
         y += 7;
         doc.text(item.description, 20, y);
         doc.text(item.quantity.toString(), 120, y);
@@ -76,6 +83,12 @@ const BasicInvoicePdfView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
       doc.line(20, y + 5, 190, y + 5);
       y += 12;
+      doc.text(`Subtotal: $${subtotal.toFixed(2)}`, 150, y);
+      y += 7;
+      doc.text(`Tax (${tax}%): $${taxAmount.toFixed(2)}`, 150, y);
+      y += 7;
+      doc.text(`Discount: $${discount.toFixed(2)}`, 150, y);
+      y += 7;
       doc.setFontSize(14);
       doc.text(`Total: $${total.toFixed(2)}`, 150, y);
 
@@ -89,9 +102,9 @@ const BasicInvoicePdfView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
   return (
     <ToolPageLayout
-      title="Basic Invoice PDF Generator"
+      title="Advanced Invoice PDF Generator"
       onBack={onBack}
-      description="Create a basic invoice and download it as a PDF."
+      description="Create a detailed invoice with tax and discount calculations, and download it as a PDF."
     >
       <div className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -140,6 +153,24 @@ const BasicInvoicePdfView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
             </div>
           ))}
           <button onClick={handleAddItem} className="px-4 py-2 bg-gray-200 rounded">Add Item</button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label htmlFor="tax" className="block text-sm font-medium text-text-primary">Tax (%)</label>
+            <input type="number" id="tax" value={tax} onChange={e => setTax(parseFloat(e.target.value))} className="w-full p-2 border rounded" />
+          </div>
+          <div>
+            <label htmlFor="discount" className="block text-sm font-medium text-text-primary">Discount ($)</label>
+            <input type="number" id="discount" value={discount} onChange={e => setDiscount(parseFloat(e.target.value))} className="w-full p-2 border rounded" />
+          </div>
+        </div>
+
+        <div className="text-right space-y-2">
+          <p>Subtotal: ${subtotal.toFixed(2)}</p>
+          <p>Tax: ${taxAmount.toFixed(2)}</p>
+          <p>Discount: ${discount.toFixed(2)}</p>
+          <p className="text-xl font-bold">Total: ${total.toFixed(2)}</p>
         </div>
 
         <button
