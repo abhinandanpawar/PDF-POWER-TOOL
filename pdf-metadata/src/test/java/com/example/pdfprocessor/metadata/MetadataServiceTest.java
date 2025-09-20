@@ -1,4 +1,4 @@
-package com.ilovepdf.pdf_metadata;
+package com.example.pdfprocessor.metadata;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -6,11 +6,8 @@ import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 

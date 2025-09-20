@@ -1,14 +1,7 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent } from '../src/tests/test-utils';
 import { describe, it, expect, vi } from 'vitest';
 import ConfigConverterView from './ConfigConverterView';
 import React from 'react';
-
-// Mock the useToasts hook
-vi.mock('../hooks/useToasts', () => ({
-  useToasts: () => ({
-    addToast: vi.fn(),
-  }),
-}));
 
 describe('ConfigConverterView', () => {
   it('renders correctly', () => {

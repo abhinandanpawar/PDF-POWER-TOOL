@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen } from '../src/tests/test-utils';
 import userEvent from '@testing-library/user-event';
 import SetMetadataView from './SetMetadataView';
 import * as apiService from '../services/apiService';
