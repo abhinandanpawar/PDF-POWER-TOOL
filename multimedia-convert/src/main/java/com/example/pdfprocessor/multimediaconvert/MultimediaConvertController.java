@@ -1,4 +1,4 @@
-package com.example.multimediaconvert;
+package com.example.pdfprocessor.multimediaconvert;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;

@@ -1,4 +1,4 @@
-package com.example.docconvert;
+package com.example.pdfprocessor.docconvert;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;

@@ -10,12 +10,16 @@ if (!rootElement) {
 }
 
 const root = ReactDOM.createRoot(rootElement);
+import { BrowserRouter } from 'react-router-dom';
+
 root.render(
   <React.StrictMode>
-    <ToastProvider>
-      <LoadingProvider>
-        <App />
-      </LoadingProvider>
-    </ToastProvider>
+    <BrowserRouter>
+      <ToastProvider>
+        <LoadingProvider>
+          <App />
+        </LoadingProvider>
+      </ToastProvider>
+    </BrowserRouter>
   </React.StrictMode>
 );

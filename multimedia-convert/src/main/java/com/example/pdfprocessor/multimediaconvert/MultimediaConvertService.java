@@ -1,4 +1,4 @@
-package com.example.multimediaconvert;
+package com.example.pdfprocessor.multimediaconvert;
 
 import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Service;

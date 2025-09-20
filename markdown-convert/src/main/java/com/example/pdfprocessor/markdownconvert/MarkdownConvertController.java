@@ -1,4 +1,4 @@
-package com.example.markdownconvert;
+package com.example.pdfprocessor.markdownconvert;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;

@@ -1,4 +1,4 @@
-package com.example.pptconvert;
+package com.example.pdfprocessor.pptconvert;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
