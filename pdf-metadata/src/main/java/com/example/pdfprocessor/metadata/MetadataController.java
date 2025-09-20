@@ -1,4 +1,4 @@
-package com.ilovepdf.pdf_metadata;
+package com.example.pdfprocessor.metadata;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;

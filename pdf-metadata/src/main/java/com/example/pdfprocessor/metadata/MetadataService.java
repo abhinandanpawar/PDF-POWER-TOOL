@@ -1,4 +1,4 @@
-package com.ilovepdf.pdf_metadata;
+package com.example.pdfprocessor.metadata;
 
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;

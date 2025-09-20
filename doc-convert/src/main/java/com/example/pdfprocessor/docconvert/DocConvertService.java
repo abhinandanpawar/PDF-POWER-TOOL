@@ -1,4 +1,4 @@
-package com.example.docconvert;
+package com.example.pdfprocessor.docconvert;
 
 import org.docx4j.Docx4J;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;

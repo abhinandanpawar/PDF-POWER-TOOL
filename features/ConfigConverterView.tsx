@@ -14,18 +14,40 @@ const ConfigConverterView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const { addToast } = useToasts();
 
   const handleConvert = () => {
+    if (fromFormat === toFormat) {
+      addToast({ type: 'warning', message: '"From" and "To" formats cannot be the same.' });
+      return;
+    }
+
+    if (!inputText.trim()) {
+      addToast({ type: 'warning', message: 'Input cannot be empty.' });
+      return;
+    }
+
     try {
       let data: any;
       // Parse input
       switch (fromFormat) {
         case 'json':
-          data = JSON.parse(inputText);
+          try {
+            data = JSON.parse(inputText);
+          } catch (e) {
+            throw new Error('Invalid JSON format.');
+          }
           break;
         case 'yaml':
-          data = yaml.load(inputText);
+          try {
+            data = yaml.load(inputText);
+          } catch (e) {
+            throw new Error('Invalid YAML format.');
+          }
           break;
         case 'xml':
-          data = JSON.parse(xml2json(inputText, { compact: true }));
+          try {
+            data = JSON.parse(xml2json(inputText, { compact: true }));
+          } catch (e) {
+            throw new Error('Invalid XML format.');
+          }
           break;
       }
 
@@ -39,12 +61,14 @@ const ConfigConverterView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           result = yaml.dump(data);
           break;
         case 'xml':
-          result = json2xml(JSON.stringify({_declaration: { _attributes: { version: '1.0', encoding: 'utf-8' } }, ...data}), { compact: true, spaces: 2 });
+          const xmlData = JSON.stringify({_declaration: { _attributes: { version: '1.0', encoding: 'utf-8' } }, ...data});
+          result = json2xml(xmlData, { compact: true, spaces: 2 });
           break;
       }
       setOutputText(result);
       addToast({ type: 'success', message: 'Conversion successful!' });
     } catch (error: any) {
+      setOutputText('');
       addToast({ type: 'error', message: `Conversion failed: ${error.message}` });
     }
   };

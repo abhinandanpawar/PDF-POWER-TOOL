@@ -1,4 +1,4 @@
-package com.example.markdownconvert;
+package com.example.pdfprocessor.markdownconvert;
 
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
 import com.vladsch.flexmark.html.HtmlRenderer;

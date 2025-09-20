@@ -1,4 +1,4 @@
-package com.example.pptconvert;
+package com.example.pdfprocessor.pptconvert;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
