@@ -1,6 +1,6 @@
 package com.example.pdfprocessor.controller;
 
-import com.example.pdfprocessor.api.PdfMetadata;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
@@ -53,35 +54,29 @@ public class MetadataControllerIntegrationTest {
         byte[] pdfContent = createTestPdfWithMetadata();
         MockMultipartFile file = new MockMultipartFile("file", "meta.pdf", MediaType.APPLICATION_PDF_VALUE, pdfContent);
 
-        MvcResult result = mockMvc.perform(multipart("/api/v1/pdfs/metadata/get").file(file))
+        MvcResult result = mockMvc.perform(multipart("/metadata/get").file(file))
                 .andExpect(status().isOk())
                 .andReturn();
 
         String jsonResponse = result.getResponse().getContentAsString();
-        PdfMetadata metadata = objectMapper.readValue(jsonResponse, PdfMetadata.class);
+        Map<String, Object> metadata = objectMapper.readValue(jsonResponse, new TypeReference<Map<String, Object>>() {});
 
-        assertEquals("Test Title", metadata.getTitle());
-        assertEquals("Test Author", metadata.getAuthor());
-        assertEquals("Test Subject", metadata.getSubject());
-        assertEquals("test, pdf, metadata", metadata.getKeywords());
+        assertEquals("Test Title", metadata.get("title"));
+        assertEquals("Test Author", metadata.get("author"));
+        assertEquals("Test Subject", metadata.get("subject"));
+        assertEquals("test, pdf, metadata", metadata.get("keywords"));
     }
 
     @Test
     public void testSetMetadata() throws Exception {
         // Create a blank PDF
-        byte[] pdfContent = createTestPdfWithMetadata(); // Can reuse this, we are overwriting anyway
+        byte[] pdfContent = createTestPdfWithMetadata();
         MockMultipartFile file = new MockMultipartFile("file", "meta.pdf", MediaType.APPLICATION_PDF_VALUE, pdfContent);
 
-        // Create new metadata
-        PdfMetadata newMetadata = new PdfMetadata();
-        newMetadata.setTitle("New Title");
-        newMetadata.setAuthor("New Author");
-
-        MockMultipartFile metadataPart = new MockMultipartFile("metadata", "", MediaType.APPLICATION_JSON_VALUE, objectMapper.writeValueAsBytes(newMetadata));
-
-        MvcResult result = mockMvc.perform(multipart("/api/v1/pdfs/metadata")
+        MvcResult result = mockMvc.perform(multipart("/metadata/set")
                         .file(file)
-                        .file(metadataPart))
+                        .param("title", "New Title")
+                        .param("author", "New Author"))
                 .andExpect(status().isOk())
                 .andReturn();
 

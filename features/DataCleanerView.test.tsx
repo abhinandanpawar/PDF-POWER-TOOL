@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent } from '../src/tests/test-utils';
 import { describe, it, expect } from 'vitest';
 import DataCleanerView from './DataCleanerView';
 import React from 'react';

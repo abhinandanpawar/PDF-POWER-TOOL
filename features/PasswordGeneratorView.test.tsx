@@ -8,12 +8,9 @@ import {
   render,
   fireEvent,
   waitFor
-} from '@testing-library/react';
+} from '../src/tests/test-utils';
 import React from 'react';
 import PasswordGeneratorView from './PasswordGeneratorView';
-import {
-  ToastProvider
-} from '../hooks/useToasts'; // Assuming ToastProvider is needed for context
 
 // Mock crypto.getRandomValues for the test environment
 let callCount = 0;
@@ -45,14 +42,6 @@ vi.mock('zxcvbn', () => ({
   }),
 }));
 
-const renderWithProviders = (ui: React.ReactElement) => {
-  return render( <
-    ToastProvider > {
-      ui
-    } < /ToastProvider>
-  );
-};
-
 describe('PasswordGeneratorView', () => {
   beforeEach(() => {
     callCount = 0;
@@ -63,7 +52,7 @@ describe('PasswordGeneratorView', () => {
   it('generates a password with the default settings', async () => {
     const {
       container
-    } = renderWithProviders( < PasswordGeneratorView onBack = {
+    } = render( < PasswordGeneratorView onBack = {
       () => {}
     }
     />);
@@ -85,7 +74,7 @@ describe('PasswordGeneratorView', () => {
     const {
       container,
       getByLabelText
-    } = renderWithProviders( < PasswordGeneratorView onBack = {
+    } = render( < PasswordGeneratorView onBack = {
       () => {}
     }
     />);
@@ -107,7 +96,7 @@ describe('PasswordGeneratorView', () => {
     const {
       container,
       getByLabelText
-    } = renderWithProviders( < PasswordGeneratorView onBack = {
+    } = render( < PasswordGeneratorView onBack = {
       () => {}
     }
     />);
@@ -123,7 +112,7 @@ describe('PasswordGeneratorView', () => {
   });
 
   it('generates a new password when the refresh button is clicked', async () => {
-      const { container, getByTitle } = renderWithProviders(<PasswordGeneratorView onBack={() => {}} />);
+      const { container, getByTitle } = render(<PasswordGeneratorView onBack={() => {}} />);
       let firstPassword = '';
 
       await waitFor(() => {
@@ -143,7 +132,7 @@ describe('PasswordGeneratorView', () => {
 
   it('uses crypto.getRandomValues instead of Math.random', async () => {
     const mathRandomSpy = vi.spyOn(Math, 'random');
-    const { container } = renderWithProviders(<PasswordGeneratorView onBack={() => {}} />);
+    const { container } = render(<PasswordGeneratorView onBack={() => {}} />);
 
     await waitFor(() => {
       const passwordDisplay = container.querySelector('.truncate');

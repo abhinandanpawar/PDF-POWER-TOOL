@@ -4,5 +4,5 @@ import java.io.InputStream;
 import java.io.IOException;
 
 public interface FontConverterService {
-    byte[] convertFont(InputStream inputStream, String toFormat) throws IOException;
+    byte[] convertFont(InputStream inputStream, String fromFormat, String toFormat) throws IOException;
 }

@@ -1,4 +1,4 @@
-package com.example.multimediaconvert;
+package com.example.pdfprocessor.multimediaconvert;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
