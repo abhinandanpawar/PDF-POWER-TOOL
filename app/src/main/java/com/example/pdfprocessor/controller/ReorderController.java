@@ -1,6 +1,7 @@
 package com.example.pdfprocessor.controller;
 
 import com.example.pdfprocessor.api.PdfReorderService;
+import com.example.pdfprocessor.services.api.service.FileValidationService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -19,9 +20,11 @@ import java.util.stream.Collectors;
 public class ReorderController {
 
     private final PdfReorderService pdfReorderService;
+    private final FileValidationService fileValidationService;
 
-    public ReorderController(PdfReorderService pdfReorderService) {
+    public ReorderController(PdfReorderService pdfReorderService, FileValidationService fileValidationService) {
         this.pdfReorderService = pdfReorderService;
+        this.fileValidationService = fileValidationService;
     }
 
     @PostMapping("/reorder-pages")
@@ -29,6 +32,9 @@ public class ReorderController {
             @RequestParam("files") List<MultipartFile> files,
             @RequestParam("order") String orderStr) {
         try {
+            for (MultipartFile file : files) {
+                fileValidationService.validateFile(file);
+            }
             List<Integer> order = parseOrderString(orderStr);
             List<InputStream> fileStreams = files.stream().map(file -> {
                 try {

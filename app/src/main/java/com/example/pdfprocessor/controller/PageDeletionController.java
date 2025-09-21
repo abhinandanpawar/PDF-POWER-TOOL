@@ -1,6 +1,7 @@
 package com.example.pdfprocessor.controller;
 
 import com.example.pdfprocessor.api.PdfPageDeletionService;
+import com.example.pdfprocessor.services.api.service.FileValidationService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -18,9 +19,11 @@ import java.util.stream.Collectors;
 public class PageDeletionController {
 
     private final PdfPageDeletionService pdfPageDeletionService;
+    private final FileValidationService fileValidationService;
 
-    public PageDeletionController(PdfPageDeletionService pdfPageDeletionService) {
+    public PageDeletionController(PdfPageDeletionService pdfPageDeletionService, FileValidationService fileValidationService) {
         this.pdfPageDeletionService = pdfPageDeletionService;
+        this.fileValidationService = fileValidationService;
     }
 
     @PostMapping("/delete-pages")
@@ -28,6 +31,9 @@ public class PageDeletionController {
             @RequestParam("files") List<MultipartFile> files,
             @RequestParam("pages") List<Integer> pages) {
         try {
+            for (MultipartFile file : files) {
+                fileValidationService.validateFile(file);
+            }
             List<InputStream> fileStreams = files.stream().map(file -> {
                 try {
                     return file.getInputStream();
@@ -42,6 +48,8 @@ public class PageDeletionController {
             headers.setContentDispositionFormData("attachment", "deleted_pages.zip");
 
             return new ResponseEntity<>(resultPdf, headers, HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage().getBytes());
         } catch (IOException e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

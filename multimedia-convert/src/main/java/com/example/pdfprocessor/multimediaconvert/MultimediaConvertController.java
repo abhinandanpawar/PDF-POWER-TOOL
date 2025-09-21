@@ -1,5 +1,6 @@
 package com.example.pdfprocessor.multimediaconvert;
 
+import com.example.pdfprocessor.services.api.service.FileValidationService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -15,12 +16,14 @@ import java.util.List;
 public class MultimediaConvertController {
 
     private final MultimediaConvertService multimediaConvertService;
+    private final FileValidationService fileValidationService;
 
     private static final List<String> ALLOWED_AUDIO_FORMATS = Arrays.asList("mp3", "wav", "flac", "ogg", "aac", "aiff", "m4a");
     private static final List<String> ALLOWED_VIDEO_FORMATS = Arrays.asList("mp4", "webm", "gif", "mov", "avi", "mkv");
 
-    public MultimediaConvertController(MultimediaConvertService multimediaConvertService) {
+    public MultimediaConvertController(MultimediaConvertService multimediaConvertService, FileValidationService fileValidationService) {
         this.multimediaConvertService = multimediaConvertService;
+        this.fileValidationService = fileValidationService;
     }
 
     @PostMapping("/audio")
@@ -28,22 +31,30 @@ public class MultimediaConvertController {
             @RequestParam("file") MultipartFile file,
             @RequestParam("format") String format,
             @RequestParam(value = "audioBitrate", required = false) Integer audioBitrate) {
-
-        if (!ALLOWED_AUDIO_FORMATS.contains(format.toLowerCase())) {
-            return ResponseEntity.badRequest().build();
+        try {
+            fileValidationService.validateFile(file);
+            if (!ALLOWED_AUDIO_FORMATS.contains(format.toLowerCase())) {
+                return ResponseEntity.badRequest().build();
+            }
+            return processConversion(file, format, true, audioBitrate);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage().getBytes());
         }
-        return processConversion(file, format, true, audioBitrate);
     }
 
     @PostMapping("/video")
     public ResponseEntity<byte[]> convertVideo(
             @RequestParam("file") MultipartFile file,
             @RequestParam("format") String format) {
-
-        if (!ALLOWED_VIDEO_FORMATS.contains(format.toLowerCase())) {
-            return ResponseEntity.badRequest().build();
+        try {
+            fileValidationService.validateFile(file);
+            if (!ALLOWED_VIDEO_FORMATS.contains(format.toLowerCase())) {
+                return ResponseEntity.badRequest().build();
+            }
+            return processConversion(file, format, false, null);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage().getBytes());
         }
-        return processConversion(file, format, false, null);
     }
 
     private ResponseEntity<byte[]> processConversion(MultipartFile file, String format, boolean isAudio, Integer audioBitrate) {

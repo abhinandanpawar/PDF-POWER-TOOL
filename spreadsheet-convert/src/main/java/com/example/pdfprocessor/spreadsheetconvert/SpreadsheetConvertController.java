@@ -1,5 +1,6 @@
 package com.example.pdfprocessor.spreadsheetconvert;
 
+import com.example.pdfprocessor.services.api.service.FileValidationService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -12,18 +13,23 @@ import org.springframework.web.multipart.MultipartFile;
 public class SpreadsheetConvertController {
 
     private final SpreadsheetConvertService spreadsheetConvertService;
+    private final FileValidationService fileValidationService;
 
-    public SpreadsheetConvertController(SpreadsheetConvertService spreadsheetConvertService) {
+    public SpreadsheetConvertController(SpreadsheetConvertService spreadsheetConvertService, FileValidationService fileValidationService) {
         this.spreadsheetConvertService = spreadsheetConvertService;
+        this.fileValidationService = fileValidationService;
     }
 
     @PostMapping("/xls-to-html")
     public ResponseEntity<String> convertXlsToHtml(@RequestParam("file") MultipartFile file) {
         try {
+            fileValidationService.validateFile(file);
             String html = spreadsheetConvertService.convertXlsToHtml(file.getInputStream(), file.getOriginalFilename());
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.TEXT_HTML);
             return new ResponseEntity<>(html, headers, HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -33,8 +39,11 @@ public class SpreadsheetConvertController {
     @PostMapping("/xls-to-pdf")
     public ResponseEntity<byte[]> convertXlsToPdf(@RequestParam("file") MultipartFile file) {
         try {
+            fileValidationService.validateFile(file);
             byte[] pdfBytes = spreadsheetConvertService.convertXlsToPdf(file.getInputStream(), file.getOriginalFilename());
             return createResponse(pdfBytes, "pdf", file.getOriginalFilename());
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage().getBytes());
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -44,8 +53,11 @@ public class SpreadsheetConvertController {
     @PostMapping("/csv-to-xlsx")
     public ResponseEntity<byte[]> convertCsvToXlsx(@RequestParam("file") MultipartFile file) {
         try {
+            fileValidationService.validateFile(file);
             byte[] xlsxBytes = spreadsheetConvertService.convertCsvToXlsx(file.getInputStream());
             return createResponse(xlsxBytes, "xlsx", file.getOriginalFilename());
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage().getBytes());
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -55,6 +67,7 @@ public class SpreadsheetConvertController {
     @PostMapping("/xlsx-to-csv")
     public ResponseEntity<String> convertXlsxToCsv(@RequestParam("file") MultipartFile file) {
         try {
+            fileValidationService.validateFile(file);
             String csv = spreadsheetConvertService.convertXlsxToCsv(file.getInputStream());
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.TEXT_PLAIN);
@@ -68,6 +81,8 @@ public class SpreadsheetConvertController {
             }
             headers.setContentDispositionFormData("attachment", outputFilename);
             return new ResponseEntity<>(csv, headers, HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

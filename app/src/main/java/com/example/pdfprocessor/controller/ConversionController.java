@@ -1,6 +1,7 @@
 package com.example.pdfprocessor.controller;
 
 import com.example.pdfprocessor.api.PdfConversionService;
+import com.example.pdfprocessor.services.api.service.FileValidationService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,19 +22,20 @@ public class ConversionController {
 
     private final PdfConversionService pdfConversionService;
     private final PdfToImageService pdfToImageService;
+    private final FileValidationService fileValidationService;
 
-    public ConversionController(PdfConversionService pdfConversionService, PdfToImageService pdfToImageService) {
+    public ConversionController(PdfConversionService pdfConversionService, PdfToImageService pdfToImageService, FileValidationService fileValidationService) {
         this.pdfConversionService = pdfConversionService;
         this.pdfToImageService = pdfToImageService;
+        this.fileValidationService = fileValidationService;
     }
 
     @PostMapping("/pdf-to-word")
     public ResponseEntity<byte[]> convertPdfsToWord(@RequestParam("files") List<MultipartFile> files) {
-        if (files.isEmpty() || files.stream().anyMatch(MultipartFile::isEmpty)) {
-            return ResponseEntity.badRequest().build();
-        }
-
         try {
+            for (MultipartFile file : files) {
+                fileValidationService.validateFile(file);
+            }
             List<InputStream> fileStreams = files.stream().map(file -> {
                 try {
                     return file.getInputStream();
@@ -48,6 +50,8 @@ public class ConversionController {
             headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE);
 
             return new ResponseEntity<>(docxBytes, headers, HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage().getBytes());
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
@@ -58,10 +62,10 @@ public class ConversionController {
             @RequestParam("files") List<MultipartFile> files,
             @RequestParam(value = "format", defaultValue = "png") String format,
             @RequestParam(value = "dpi", defaultValue = "300") int dpi) {
-        if (files.isEmpty() || files.stream().anyMatch(MultipartFile::isEmpty)) {
-            return ResponseEntity.badRequest().build();
-        }
         try {
+            for (MultipartFile file : files) {
+                fileValidationService.validateFile(file);
+            }
             List<InputStream> fileStreams = files.stream().map(file -> {
                 try {
                     return file.getInputStream();
@@ -76,6 +80,8 @@ public class ConversionController {
             headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"images.zip\"");
 
             return new ResponseEntity<>(zipBytes, headers, HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage().getBytes());
         } catch (IOException e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
