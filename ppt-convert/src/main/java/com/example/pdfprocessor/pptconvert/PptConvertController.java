@@ -1,5 +1,6 @@
 package com.example.pdfprocessor.pptconvert;
 
+import com.example.pdfprocessor.services.api.service.FileValidationService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -12,20 +13,21 @@ import org.springframework.web.multipart.MultipartFile;
 public class PptConvertController {
 
     private final PptConvertService pptConvertService;
+    private final FileValidationService fileValidationService;
 
-    public PptConvertController(PptConvertService pptConvertService) {
+    public PptConvertController(PptConvertService pptConvertService, FileValidationService fileValidationService) {
         this.pptConvertService = pptConvertService;
+        this.fileValidationService = fileValidationService;
     }
 
     @PostMapping("/to-pdf")
     public ResponseEntity<byte[]> convertPptToPdf(@RequestParam("file") MultipartFile file) {
-        if (file.isEmpty()) {
-            return ResponseEntity.badRequest().build();
-        }
-
         try {
+            fileValidationService.validateFile(file);
             byte[] pdfBytes = pptConvertService.convertPptToPdf(file.getInputStream());
             return createResponse(pdfBytes, "pdf", file.getOriginalFilename());
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage().getBytes());
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -34,13 +36,12 @@ public class PptConvertController {
 
     @PostMapping("/to-images")
     public ResponseEntity<byte[]> convertPptToImages(@RequestParam("file") MultipartFile file) {
-        if (file.isEmpty()) {
-            return ResponseEntity.badRequest().build();
-        }
-
         try {
+            fileValidationService.validateFile(file);
             byte[] zipBytes = pptConvertService.convertPptToImages(file.getInputStream());
             return createResponse(zipBytes, "zip", file.getOriginalFilename());
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage().getBytes());
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

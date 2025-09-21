@@ -1,5 +1,6 @@
 package com.example.pdfprocessor.metadata;
 
+import com.example.pdfprocessor.services.api.service.FileValidationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -18,11 +19,17 @@ public class MetadataController {
     @Autowired
     private MetadataService metadataService;
 
+    @Autowired
+    private FileValidationService fileValidationService;
+
     @PostMapping("/get")
     public ResponseEntity<Map<String, Object>> getMetadata(@RequestParam("file") MultipartFile file) {
         try {
+            fileValidationService.validateFile(file);
             Map<String, Object> metadata = metadataService.getMetadata(file.getBytes());
             return ResponseEntity.ok(metadata);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
@@ -32,6 +39,7 @@ public class MetadataController {
     public ResponseEntity<byte[]> setMetadata(@RequestParam("file") MultipartFile file,
                                               @RequestParam Map<String, String> metadata) {
         try {
+            fileValidationService.validateFile(file);
             byte[] updatedPdf = metadataService.setMetadata(file.getBytes(), metadata);
 
             HttpHeaders headers = new HttpHeaders();
@@ -39,6 +47,8 @@ public class MetadataController {
             headers.setContentDispositionFormData("attachment", "updated_" + file.getOriginalFilename());
 
             return new ResponseEntity<>(updatedPdf, headers, HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage().getBytes());
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }

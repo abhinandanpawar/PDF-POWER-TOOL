@@ -1,6 +1,7 @@
 package com.example.pdfprocessor.controller;
 
 import com.example.pdfprocessor.api.PdfAnnotationService;
+import com.example.pdfprocessor.services.api.service.FileValidationService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -18,9 +19,11 @@ import java.util.stream.Collectors;
 public class AnnotationController {
 
     private final PdfAnnotationService pdfAnnotationService;
+    private final FileValidationService fileValidationService;
 
-    public AnnotationController(PdfAnnotationService pdfAnnotationService) {
+    public AnnotationController(PdfAnnotationService pdfAnnotationService, FileValidationService fileValidationService) {
         this.pdfAnnotationService = pdfAnnotationService;
+        this.fileValidationService = fileValidationService;
     }
 
     @PostMapping("/watermark")
@@ -28,6 +31,9 @@ public class AnnotationController {
             @RequestParam("files") List<MultipartFile> files,
             @RequestParam("text") String text) {
         try {
+            for (MultipartFile file : files) {
+                fileValidationService.validateFile(file);
+            }
             List<InputStream> fileStreams = files.stream().map(file -> {
                 try {
                     return file.getInputStream();
@@ -42,6 +48,8 @@ public class AnnotationController {
             headers.setContentDispositionFormData("attachment", "watermarked.zip");
 
             return new ResponseEntity<>(watermarkedPdf, headers, HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage().getBytes());
         } catch (IOException e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

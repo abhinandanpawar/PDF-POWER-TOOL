@@ -1,6 +1,7 @@
 package com.example.pdfprocessor.controller;
 
 import com.example.pdfprocessor.api.PdfRotationService;
+import com.example.pdfprocessor.services.api.service.FileValidationService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -18,9 +19,11 @@ import java.util.stream.Collectors;
 public class RotationController {
 
     private final PdfRotationService pdfRotationService;
+    private final FileValidationService fileValidationService;
 
-    public RotationController(PdfRotationService pdfRotationService) {
+    public RotationController(PdfRotationService pdfRotationService, FileValidationService fileValidationService) {
         this.pdfRotationService = pdfRotationService;
+        this.fileValidationService = fileValidationService;
     }
 
     @PostMapping("/rotate-pages")
@@ -29,6 +32,9 @@ public class RotationController {
             @RequestParam("pages") List<Integer> pages,
             @RequestParam("degrees") int degrees) {
         try {
+            for (MultipartFile file : files) {
+                fileValidationService.validateFile(file);
+            }
             List<InputStream> fileStreams = files.stream().map(file -> {
                 try {
                     return file.getInputStream();
