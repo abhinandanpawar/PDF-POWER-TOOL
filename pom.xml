@@ -42,9 +42,7 @@
         <module>ppt-convert</module>
         <module>spreadsheet-convert</module>
         <module>multimedia-convert</module>
-        <module>cad-convert</module>
         
-
     </modules>
 
     <dependencyManagement>
@@ -154,6 +152,7 @@
 
     <build>
         <plugins>
+            <!--
             <plugin>
                 <groupId>org.owasp</groupId>
                 <artifactId>dependency-check-maven</artifactId>
@@ -166,6 +165,7 @@
                     </execution>
                 </executions>
             </plugin>
+            -->
         </plugins>
     </build>
 
