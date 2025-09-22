@@ -3,6 +3,7 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 import { nodePolyfills } from 'vite-plugin-node-polyfills';
+import tailwindcss from 'tailwindcss';
 
 export default defineConfig({
   plugins: [
@@ -52,6 +53,11 @@ export default defineConfig({
     },
     watch: {
       ignored: ['**/vite.config.ts'],
+    },
+  },
+  css: {
+    postcss: {
+      plugins: [tailwindcss],
     },
   },
   resolve: {

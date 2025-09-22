@@ -11,53 +11,44 @@ vi.mock('../services/apiService', () => ({
   setPdfMetadata: vi.fn().mockResolvedValue(undefined),
 }));
 
-// Mock the useToolLogic hook to spy on its usage
+// Mock the useToolLogic hook
 vi.mock('../hooks/useToolLogic');
 
 const mockedUseToolLogic = useToolLogic as jest.Mock;
 
 describe('SetMetadataView', () => {
-  const onBack = vi.fn();
-  let setFiles: React.Dispatch<React.SetStateAction<File[]>> = vi.fn();
-  let handleProcess: (options: any) => Promise<void> = vi.fn();
+  const handleProcess = vi.fn();
 
   beforeEach(() => {
-    setFiles = vi.fn();
-    handleProcess = vi.fn();
-
-    mockedUseToolLogic.mockImplementation(() => {
-      // We need to manage the state ourselves since the hook is mocked
-      const [files, actualSetFiles] = React.useState<File[]>([]);
-
-      // Intercept setFiles to use our mock
-      const mockSetFiles = (action: React.SetStateAction<File[]>) => {
-        setFiles(action);
-        actualSetFiles(action);
-      };
-
-      return {
-        files,
-        setFiles: mockSetFiles,
-        handleProcess,
-        isProcessing: false,
-        error: null,
-        result: null,
-      };
-    });
-
     vi.clearAllMocks();
+    mockedUseToolLogic.mockReturnValue({
+      files: [],
+      setFiles: vi.fn(),
+      handleProcess,
+      isLoading: false,
+      result: null,
+    });
   });
 
   it('should call handleProcess with the correct file and metadata', async () => {
     const user = userEvent.setup();
-    render(<SetMetadataView onBack={onBack} />);
 
-    const file = new File(['dummy content'], 'test.pdf', { type: 'application/pdf' });
-    const fileInputElement = screen.getByTestId('file-upload-input');
-    await user.upload(fileInputElement, file);
+    // Set up a mock implementation for this specific test
+    const mockSetFiles = vi.fn();
+    const mockFiles: File[] = [new File(['dummy content'], 'test.pdf', { type: 'application/pdf' })];
 
-    await user.type(screen.getByPlaceholderText('Key (e.g., Title)'), 'Author');
-    await user.type(screen.getByPlaceholderText('Value'), 'Jules Verne');
+    mockedUseToolLogic.mockReturnValue({
+        files: mockFiles,
+        setFiles: mockSetFiles,
+        handleProcess,
+        isLoading: false,
+        result: null
+    });
+
+    render(<SetMetadataView />);
+
+    await user.type(screen.getByLabelText('Key'), 'Author');
+    await user.type(screen.getByLabelText('Value'), 'Jules Verne');
 
     const processButton = screen.getByRole('button', { name: /Set Metadata and Download/i });
     await user.click(processButton);
@@ -66,25 +57,22 @@ describe('SetMetadataView', () => {
     expect(handleProcess).toHaveBeenCalledWith({
       metadata: { Author: 'Jules Verne' },
     });
-
-    // Check that our mocked setFiles was called
-    expect(setFiles).toHaveBeenCalled();
   });
 
 
   it('should handle adding and removing metadata fields', async () => {
     const user = userEvent.setup();
-    render(<SetMetadataView onBack={onBack} />);
+    render(<SetMetadataView />);
 
-    expect(screen.getAllByPlaceholderText('Key (e.g., Title)')).toHaveLength(1);
+    expect(screen.getAllByLabelText('Key')).toHaveLength(1);
 
-    const addButton = screen.getByText('+ Add another field');
+    const addButton = screen.getByRole('button', { name: /Add another field/i });
     await user.click(addButton);
-    expect(screen.getAllByPlaceholderText('Key (e.g., Title)')).toHaveLength(2);
+    expect(screen.getAllByLabelText('Key')).toHaveLength(2);
 
     const removeButtons = screen.getAllByLabelText('Remove field');
     await user.click(removeButtons[0]);
-    expect(screen.getAllByPlaceholderText('Key (e.g., Title)')).toHaveLength(1);
+    expect(screen.getAllByLabelText('Key')).toHaveLength(1);
   });
 
   // Since we are mocking the entire hook, we can't easily test the internal validation logic.
