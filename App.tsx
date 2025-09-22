@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Routes, Route, Link } from 'react-router-dom';
 import ToastContainer from './components/ToastContainer';
 import LoadingOverlay from './components/LoadingOverlay';
@@ -7,6 +7,8 @@ import ToolCard from './components/ToolCard';
 import Grid from './components/Grid';
 import Container from './components/Container';
 import Header from './components/Header';
+import SkeletonCard from './components/SkeletonCard';
+import ErrorBoundary from './components/ErrorBoundary';
 import { Tool, ToolCategory, ToolInfo } from './types';
 
 // Import all feature components
@@ -98,6 +100,15 @@ const toolViewMap: { [key in Tool]?: React.ComponentType<{}> } = {
 };
 
 const App: React.FC = () => {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1500); // Simulate a 1.5 second loading time
+    return () => clearTimeout(timer);
+  }, []);
+
   const groupedTools = TOOLS.reduce((acc, tool) => {
     if (!acc[tool.category]) {
       acc[tool.category] = [];
@@ -113,36 +124,48 @@ const App: React.FC = () => {
       <ReloadPrompt />
       <Header />
       <main className="flex-grow">
-        <Routes>
-          <Route path="/" element={
-            <Container className="py-8">
+        <ErrorBoundary>
+          <Routes>
+            <Route path="/" element={
+              <Container className="py-8">
               <div className="animate-fade-in">
                 <div className="text-center mb-12">
-                    <h2 className="text-4xl sm:text-5xl font-extrabold mb-4 text-text-primary tracking-tight">
+                    <h2 className="text-4xl sm:text-5xl font-extrabold mb-4 text-foreground tracking-tight">
                     The Ultimate PDF Power Toolbox
                     </h2>
-                    <p className="text-lg sm:text-xl text-text-secondary max-w-3xl mx-auto">
+                    <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl mx-auto">
                     Effortlessly merge, split, compress, convert, and edit your PDF files with our comprehensive suite of powerful, easy-to-use tools.
                     </p>
                 </div>
 
                 <div className="space-y-12">
-                    {Object.entries(groupedTools).map(([category, tools]) => (
-                    <section key={category}>
-                        <h3 className="text-2xl font-bold text-text-primary mb-6 border-b-2 border-border pb-2">
-                        {category}
-                        </h3>
-                        <Grid>
-                          {tools.map(tool => (
-                              <Link to={`/${tool.key.toLowerCase()}`} key={tool.key}>
-                                <ToolCard
-                                  tool={tool}
-                                />
-                              </Link>
-                          ))}
-                        </Grid>
-                    </section>
-                    ))}
+                  {loading
+                    ? Array.from({ length: 3 }).map((_, i) => (
+                        <section key={i} className="bg-card border border-border rounded-xl p-6">
+                          <div className="h-8 w-1/4 rounded-md bg-muted/50 animate-pulse mb-6" />
+                          <Grid>
+                            {Array.from({ length: 4 }).map((_, j) => (
+                              <SkeletonCard key={j} />
+                            ))}
+                          </Grid>
+                        </section>
+                      ))
+                    : Object.entries(groupedTools).map(([category, tools]) => (
+                        <section key={category} className="bg-card border border-border rounded-xl p-6">
+                          <h3 className="text-2xl font-bold text-foreground mb-6">
+                            {category}
+                          </h3>
+                          <Grid>
+                            {tools.map(tool => (
+                                <Link to={`/${tool.key.toLowerCase()}`} key={tool.key}>
+                                  <ToolCard
+                                    tool={tool}
+                                  />
+                                </Link>
+                            ))}
+                          </Grid>
+                        </section>
+                      ))}
                 </div>
               </div>
             </Container>
@@ -154,11 +177,16 @@ const App: React.FC = () => {
               <Route
                 key={tool.key}
                 path={`/${tool.key.toLowerCase()}`}
-                element={<Container className="py-8"><ToolComponent /></Container>}
+                element={
+                  <ErrorBoundary>
+                    <Container className="py-8"><ToolComponent /></Container>
+                  </ErrorBoundary>
+                }
               />
             );
           })}
         </Routes>
+      </ErrorBoundary>
       </main>
       <footer className="text-center p-4 text-text-secondary border-t border-border">
           <p>&copy; {new Date().getFullYear()} PDF Power Toolbox. All rights reserved.</p>

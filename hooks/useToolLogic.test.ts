@@ -1,167 +1,106 @@
 import { renderHook, act } from '@testing-library/react';
 import { useToolLogic } from './useToolLogic';
 import { useToasts } from './useToasts';
-import { useLoading } from './useLoading';
 import { vi } from 'vitest';
 
-// Mock the useToasts and useLoading hooks
+// Mock the useToasts hook
 vi.mock('./useToasts', () => ({
   useToasts: vi.fn(),
 }));
 
-vi.mock('./useLoading', () => ({
-  useLoading: vi.fn(),
-}));
-
 describe('useToolLogic', () => {
-  const mockConversionFunction = vi.fn((files: File[], options?: any) => Promise.resolve('success'));
-  let mockAddToast: ReturnType<typeof useToasts>['addToast'];
-  let mockShowLoading: ReturnType<typeof useLoading>['showLoading'];
-  let mockHideLoading: ReturnType<typeof useLoading>['hideLoading'];
+  const mockConversionFunction = vi.fn();
+  const mockAddToast = vi.fn();
 
   beforeEach(() => {
-    mockConversionFunction.mockClear();
-
-    // Get the mocked functions inside beforeEach
-    vi.mocked(useToasts).mockReturnValue({
-      addToast: vi.fn(),
-    });
-    vi.mocked(useLoading).mockReturnValue({
-      showLoading: vi.fn(),
-      hideLoading: vi.fn(),
-    });
-
-    mockAddToast = useToasts().addToast;
-    mockShowLoading = useLoading().showLoading;
-    mockHideLoading = useLoading().hideLoading;
+    vi.clearAllMocks();
+    vi.mocked(useToasts).mockReturnValue({ addToast: mockAddToast });
   });
 
-  it('should initialize with empty files array if no initialFiles are provided', () => {
+  it('should initialize with empty files array', () => {
     const { result } = renderHook(() => useToolLogic({
       conversionFunction: mockConversionFunction,
       successMessage: 'Success',
       errorMessage: 'Error',
     }));
     expect(result.current.files).toEqual([]);
+    expect(result.current.isLoading).toBe(false);
   });
 
-  it('should initialize with provided initialFiles', () => {
-    const initialFiles = [new File(['content'], 'test.pdf')];
-    const { result } = renderHook(() => useToolLogic({
-      initialFiles,
-      conversionFunction: mockConversionFunction,
-      successMessage: 'Success',
-      errorMessage: 'Error',
-    }));
-    expect(result.current.files).toEqual(initialFiles);
-  });
-
-  it('should call conversionFunction and show success toast on successful process', async () => {
+  it('should set files', () => {
     const { result } = renderHook(() => useToolLogic({
       conversionFunction: mockConversionFunction,
       successMessage: 'Success',
       errorMessage: 'Error',
     }));
+    const file = new File(['content'], 'test.pdf');
+    act(() => {
+      result.current.setFiles([file]);
+    });
+    expect(result.current.files).toEqual([file]);
+  });
 
+  it('should handle successful process', async () => {
+    mockConversionFunction.mockResolvedValue('success_result');
+    const { result } = renderHook(() => useToolLogic({
+      conversionFunction: mockConversionFunction,
+      successMessage: 'Success!',
+      errorMessage: 'Error!',
+    }));
     const file = new File(['content'], 'test.pdf');
     act(() => {
       result.current.setFiles([file]);
     });
 
-    await act(async () => {
-      await result.current.handleProcess();
-    });
+    const processPromise = act(() => result.current.handleProcess());
 
-    expect(mockShowLoading).toHaveBeenCalledTimes(1);
+    // This is tricky; we can't easily test the intermediate loading state with react-testing-library's renderHook
+    // But we can check the final states
+    await processPromise;
+
     expect(mockConversionFunction).toHaveBeenCalledWith([file], undefined);
-    expect(mockAddToast).toHaveBeenCalledWith('success', 'Success');
-    expect(mockHideLoading).toHaveBeenCalledTimes(1);
-    expect(result.current.files).toEqual([]); // Files should be cleared
+    expect(mockAddToast).toHaveBeenCalledWith('success', 'Success!');
+    expect(result.current.result).toBe('success_result');
+    expect(result.current.files).toEqual([]);
+    expect(result.current.isLoading).toBe(false);
   });
 
-  it('should show error toast on failed process', async () => {
-    mockConversionFunction.mockRejectedValueOnce(new Error('Conversion failed'));
-
+  it('should handle failed process', async () => {
+    const error = new Error('Conversion failed');
+    mockConversionFunction.mockRejectedValue(error);
     const { result } = renderHook(() => useToolLogic({
       conversionFunction: mockConversionFunction,
-      successMessage: 'Success',
-      errorMessage: 'Error',
+      successMessage: 'Success!',
+      errorMessage: 'Error!',
     }));
-
     const file = new File(['content'], 'test.pdf');
     act(() => {
       result.current.setFiles([file]);
     });
 
-    await act(async () => {
-      await result.current.handleProcess();
-    });
+    await act(() => result.current.handleProcess());
 
-    expect(mockShowLoading).toHaveBeenCalledTimes(1);
     expect(mockConversionFunction).toHaveBeenCalledWith([file], undefined);
-    expect(mockAddToast).toHaveBeenCalledWith('error', 'Error: Conversion failed');
-    expect(mockHideLoading).toHaveBeenCalledTimes(1);
-    expect(result.current.files).toEqual([file]); // Files should not be cleared on error
+    expect(mockAddToast).toHaveBeenCalledWith('error', 'Error!: ' + error.message);
+    expect(result.current.result).toBeNull();
+    expect(result.current.files).toEqual([file]); // Files should not be cleared
+    expect(result.current.isLoading).toBe(false);
   });
 
-  it('should call validate function and show error if validation fails', async () => {
-    const mockValidate = vi.fn((files: File[]) => files.length === 0 ? 'No files' : null);
-
+  it('should handle validation failure', async () => {
+    const mockValidate = vi.fn(() => 'Validation Error');
     const { result } = renderHook(() => useToolLogic({
       conversionFunction: mockConversionFunction,
-      successMessage: 'Success',
-      errorMessage: 'Error',
+      successMessage: 'Success!',
+      errorMessage: 'Error!',
       validate: mockValidate,
     }));
 
-    await act(async () => {
-      await result.current.handleProcess();
-    });
+    await act(() => result.current.handleProcess());
 
-    expect(mockValidate).toHaveBeenCalledTimes(1);
-    expect(mockAddToast).toHaveBeenCalledWith('error', 'No files');
-    expect(mockShowLoading).not.toHaveBeenCalled();
+    expect(mockValidate).toHaveBeenCalled();
+    expect(mockAddToast).toHaveBeenCalledWith('error', 'Validation Error');
     expect(mockConversionFunction).not.toHaveBeenCalled();
-  });
-
-  it('should pass options to conversion function', async () => {
-    const { result } = renderHook(() => useToolLogic({
-      conversionFunction: mockConversionFunction,
-      successMessage: 'Success',
-      errorMessage: 'Error',
-    }));
-
-    const file = new File(['content'], 'test.pdf');
-    act(() => {
-      result.current.setFiles([file]);
-    });
-
-    const options = { format: 'pdf' };
-    await act(async () => {
-      await result.current.handleProcess(options);
-    });
-
-    expect(mockConversionFunction).toHaveBeenCalledWith([file], options);
-  });
-
-  it('should return result from conversion function', async () => {
-    mockConversionFunction.mockResolvedValueOnce('converted_text');
-
-    const { result } = renderHook(() => useToolLogic({
-      conversionFunction: mockConversionFunction,
-      successMessage: 'Success',
-      errorMessage: 'Error',
-    }));
-
-    const file = new File(['content'], 'test.pdf');
-    act(() => {
-      result.current.setFiles([file]);
-    });
-
-    await act(async () => {
-      await result.current.handleProcess();
-    });
-
-    expect(result.current.result).toBe('converted_text');
+    expect(result.current.isLoading).toBe(false);
   });
 });

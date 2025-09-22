@@ -14,7 +14,7 @@ export const useToolLogic = <T, R>(options: ToolLogicOptions<T, R>) => {
   const [files, setFiles] = useState<File[]>(options.initialFiles || []);
   const [result, setResult] = useState<R | null>(null);
   const { addToast } = useToasts();
-  const { showLoading, hideLoading } = useLoading();
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleProcess = async (conversionOptions?: T) => {
     if (options.validate) {
@@ -30,7 +30,7 @@ export const useToolLogic = <T, R>(options: ToolLogicOptions<T, R>) => {
       return;
     }
 
-    showLoading();
+    setIsLoading(true);
     try {
       const res = await options.conversionFunction(files, conversionOptions);
       setFiles([]);
@@ -39,9 +39,9 @@ export const useToolLogic = <T, R>(options: ToolLogicOptions<T, R>) => {
     } catch (e) {
       addToast('error', options.errorMessage + ': ' + (e as Error).message);
     } finally {
-      hideLoading();
+      setIsLoading(false);
     }
   };
 
-  return { files, setFiles, handleProcess, result };
+  return { files, setFiles, handleProcess, result, isLoading };
 };
