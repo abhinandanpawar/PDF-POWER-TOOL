@@ -21,17 +21,11 @@ export enum Tool {
   ReorderPages = 'reorder-pages',
   GetMetadata = 'get-metadata',
   SetMetadata = 'set-metadata',
-
-
   // Developer Tools
   JsonFormat = 'json-format',
   DataClean = 'data-clean',
   ConfigConvert = 'config-convert',
-
   CsvJsonConverter = 'csv-json-converter',
-
-  CadConvert = 'cad-convert',
-
   // Creative Tools
   QrCodeGenerator = 'qr-code-generator',
   BasicInvoicePdf = 'basic-invoice-pdf',
@@ -47,9 +41,7 @@ export enum Tool {
   FaviconGenerator = 'favicon-generator',
   MemeMaker = 'meme-maker',
   BadgeIdCardMaker = 'badge-id-card-maker',
-
   PasswordGenerator = 'password-generator',
-
 }
 
 export enum ToolCategory {
