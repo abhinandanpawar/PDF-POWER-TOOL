@@ -38,25 +38,26 @@ const ExtractTextView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         <button
           onClick={() => handleProcess()}
           disabled={files.length === 0}
-          className="w-full bg-primary text-white font-bold py-3 px-4 rounded-lg hover:bg-primary-hover disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors"
+          className="w-full bg-primary text-primary-foreground font-bold py-3 px-4 rounded-lg hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed transition-colors"
         >
           Extract Text
         </button>
         {extractedText !== null && (
           <div className="mt-6">
-            <h3 className="text-lg font-semibold mb-2">Extracted Text:</h3>
-            <textarea
-              readOnly
-              value={extractedText}
-              className="w-full h-64 bg-secondary border border-border rounded-lg p-3 text-text-primary font-mono text-sm"
-              aria-label="Extracted text"
-            />
-            <button
-                onClick={handleCopyToClipboard}
-                className="mt-2 bg-gray-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-gray-500 transition-colors"
-            >
-                Copy to Clipboard
-            </button>
+            <div className="flex justify-between items-center mb-2">
+              <h3 className="text-lg font-semibold">Extracted Text:</h3>
+              <button
+                  onClick={handleCopyToClipboard}
+                  className="bg-secondary text-secondary-foreground font-bold py-2 px-4 rounded-lg hover:bg-secondary/90 transition-colors"
+              >
+                  Copy to Clipboard
+              </button>
+            </div>
+            <div className="bg-muted border border-border rounded-lg p-4">
+              <pre className="w-full h-64 overflow-auto text-foreground font-mono text-base whitespace-pre-wrap">
+                {extractedText}
+              </pre>
+            </div>
           </div>
         )}
       </div>

@@ -11,49 +11,43 @@ export default {
   theme: {
     extend: {
       colors: {
+        background: 'rgb(248 249 250)', // #F8F9FA
+        foreground: 'rgb(44 62 80)',     // #2C3E50
         primary: {
-          DEFAULT: 'hsl(210, 100%, 50%)',
-          foreground: 'hsl(210, 100%, 98%)',
-          50: 'hsl(210, 100%, 95%)',
-          100: 'hsl(210, 100%, 90%)',
-          200: 'hsl(210, 100%, 80%)',
-          300: 'hsl(210, 100%, 70%)',
-          400: 'hsl(210, 100%, 60%)',
-          500: 'hsl(210, 100%, 50%)',
-          600: 'hsl(210, 100%, 40%)',
-          700: 'hsl(210, 100%, 30%)',
-          800: 'hsl(210, 100%, 20%)',
-          900: 'hsl(210, 100%, 10%)',
+          DEFAULT: 'rgb(52 152 219)',   // #3498DB
+          foreground: 'rgb(255 255 255)', // #FFFFFF
         },
         secondary: {
-          DEFAULT: 'hsl(240, 6%, 10%)',
-          foreground: 'hsl(240, 5%, 96%)',
+          DEFAULT: 'rgb(52 73 94)',      // #34495E
+          foreground: 'rgb(255 255 255)', // #FFFFFF
         },
         destructive: {
-          DEFAULT: 'hsl(0, 84%, 60%)',
-          foreground: 'hsl(0, 0%, 98%)',
+          DEFAULT: 'rgb(231 76 60)',     // #E74C3C
+          foreground: 'rgb(255 255 255)', // #FFFFFF
+        },
+        success: {
+          DEFAULT: 'rgb(39 174 96)',     // #27AE60
+          foreground: 'rgb(255 255 255)', // #FFFFFF
         },
         muted: {
-          DEFAULT: 'hsl(240, 4%, 46%)',
-          foreground: 'hsl(240, 4%, 65%)',
+          DEFAULT: 'rgb(236 240 241)',   // #ECF0F1
+          foreground: 'rgb(52 73 94)',    // #34495E
         },
         accent: {
-          DEFAULT: 'hsl(240, 6%, 10%)',
-          foreground: 'hsl(240, 5%, 96%)',
-        },
-        popover: {
-          DEFAULT: 'hsl(240, 10%, 4%)',
-          foreground: 'hsl(240, 5%, 96%)',
+          DEFAULT: 'rgb(22 160 133)',    // #16A085
+          foreground: 'rgb(255 255 255)', // #FFFFFF
         },
         card: {
-          DEFAULT: 'hsl(240, 10%, 4%)',
-          foreground: 'hsl(240, 5%, 96%)',
+          DEFAULT: 'rgb(255 255 255)',   // #FFFFFF
+          foreground: 'rgb(44 62 80)',     // #2C3E50
         },
-        background: 'hsl(240, 10%, 4%)',
-        foreground: 'hsl(0, 0%, 98%)',
-        border: 'hsl(240, 4%, 16%)',
-        input: 'hsl(240, 4%, 16%)',
-        ring: 'hsl(210, 100%, 50%)',
+        popover: {
+          DEFAULT: 'rgb(255 255 255)',   // #FFFFFF
+          foreground: 'rgb(44 62 80)',     // #2C3E50
+        },
+        border: 'rgb(189 195 199)',     // #BDC3C7
+        input: 'rgb(189 195 199)',        // #BDC3C7
+        ring: 'rgb(41 128 185)',      // #2980B9
       },
       borderRadius: {
         lg: `1rem`,

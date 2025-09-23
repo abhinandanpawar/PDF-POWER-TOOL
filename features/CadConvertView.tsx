@@ -1,12 +1,12 @@
 import React from 'react';
 import ToolPageLayout from '../components/ToolPageLayout';
 import FileUpload from '../components/FileUpload';
-import { convertCadToPdf } from '../services/apiService';
+// import { convertCadToPdf } from '../services/apiService';
 import { useToolLogic } from '../hooks/useToolLogic';
 
 const CadConvertView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const { files, setFiles, handleProcess } = useToolLogic({
-    conversionFunction: (files) => convertCadToPdf(files[0]),
+    conversionFunction: async (files) => { alert('This feature is temporarily disabled.'); },
     successMessage: 'Converted to PDF successfully! Your download has started.',
     errorMessage: 'Failed to convert DXF to PDF',
     validate: (files) => {
@@ -30,8 +30,8 @@ const CadConvertView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         <FileUpload files={files} setFiles={setFiles} accept=".dxf" multiple={false} />
         <button
           onClick={() => handleProcess()}
-          disabled={files.length === 0}
-          className="w-full bg-primary text-white font-bold py-3 px-4 rounded-lg hover:bg-primary-hover disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors"
+          disabled={true}
+          className="w-full bg-primary text-primary-foreground font-bold py-3 px-4 rounded-lg hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed transition-colors"
         >
           Convert to PDF
         </button>
