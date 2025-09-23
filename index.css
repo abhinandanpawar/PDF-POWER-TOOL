@@ -2,6 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+    body {
+        background-color: theme('colors.background');
+        color: theme('colors.foreground');
+        font-size: 14px;
+        line-height: 1.6;
+    }
+}
+
 .cm-secret {
     background-color: rgba(255, 255, 0, 0.1);
     text-decoration: underline wavy red 1px;

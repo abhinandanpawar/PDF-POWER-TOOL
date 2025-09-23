@@ -28,16 +28,31 @@ const GetMetadataView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         <button
           onClick={() => handleProcess()}
           disabled={files.length !== 1}
-          className="w-full bg-primary text-white font-bold py-3 px-4 rounded-lg hover:bg-primary-hover disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors"
+          className="w-full bg-primary text-primary-foreground font-bold py-3 px-4 rounded-lg hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed transition-colors"
         >
           Get Metadata
         </button>
-        {metadata && (
+        {metadata && Object.keys(metadata).length > 0 && (
           <div className="mt-6">
             <h3 className="text-lg font-semibold mb-2">PDF Metadata:</h3>
-            <pre className="w-full bg-secondary border border-border rounded-lg p-4 text-text-primary font-mono text-sm overflow-x-auto">
-              {JSON.stringify(metadata, null, 2)}
-            </pre>
+            <div className="bg-card border border-border rounded-lg overflow-hidden">
+              <table className="w-full text-left text-base">
+                <thead className="bg-muted">
+                  <tr>
+                    <th className="p-4 font-semibold">Property</th>
+                    <th className="p-4 font-semibold">Value</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {Object.entries(metadata).map(([key, value]) => (
+                    <tr key={key} className="border-t border-border">
+                      <td className="p-4 font-medium text-foreground">{key}</td>
+                      <td className="p-4 text-foreground break-all">{String(value)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
       </div>
