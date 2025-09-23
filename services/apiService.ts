@@ -70,7 +70,6 @@ export const convertWordToPdf = async (file: File) => {
     const formData = new FormData();
     formData.append('file', file);
     const response = await fetch(`${BASE_URL}/doc-convert/to-pdf`, { method: 'POST', body: formData });
-
     let outputFilename = 'converted.pdf';
     if (file.name) {
         const dotIndex = file.name.lastIndexOf('.');
@@ -78,15 +77,7 @@ export const convertWordToPdf = async (file: File) => {
             outputFilename = file.name.substring(0, dotIndex) + ".pdf";
         }
     }
-
     await processFileResponse(response, outputFilename);
-};
-
-export const convertCadToPdf = async (file: File) => {
-    const formData = new FormData();
-    formData.append('file', file);
-    const response = await fetch(`${BASE_URL}/cad-convert`, { method: 'POST', body: formData });
-    await processFileResponse(response, 'converted.pdf');
 };
 
 export const convertWordToTxt = async (file: File): Promise<string> => {
@@ -102,7 +93,6 @@ export const convertImage = async (file: File, format: string) => {
     formData.append('file', file);
     formData.append('format', format);
     const response = await fetch(`${BASE_URL}/image-convert/convert`, { method: 'POST', body: formData });
-
     let outputFilename = `converted.${format}`;
     if (file.name) {
         const dotIndex = file.name.lastIndexOf('.');
@@ -110,18 +100,15 @@ export const convertImage = async (file: File, format: string) => {
             outputFilename = file.name.substring(0, dotIndex) + `.${format}`;
         }
     }
-
     await processFileResponse(response, outputFilename);
 };
 
 export const convertMarkdown = async (file: File, format: 'html' | 'pdf') => {
     const formData = new FormData();
     formData.append('file', file);
-
     const endpoint = `${BASE_URL}/markdown-convert/to-${format}`;
     const response = await fetch(endpoint, { method: 'POST', body: formData });
     await handleApiResponse(response);
-
     let outputFilename = `converted.${format}`;
     if (file.name) {
         const dotIndex = file.name.lastIndexOf('.');
@@ -129,7 +116,6 @@ export const convertMarkdown = async (file: File, format: 'html' | 'pdf') => {
             outputFilename = file.name.substring(0, dotIndex) + `.${format}`;
         }
     }
-
     if (format === 'html') {
         const html = await response.text();
         const blob = new Blob([html], { type: 'text/html' });
@@ -143,10 +129,8 @@ export const convertMarkdown = async (file: File, format: 'html' | 'pdf') => {
 export const convertPpt = async (file: File, format: 'pdf' | 'images') => {
     const formData = new FormData();
     formData.append('file', file);
-
     const endpoint = `${BASE_URL}/ppt-convert/to-${format}`;
     const response = await fetch(endpoint, { method: 'POST', body: formData });
-
     const outputExtension = format === 'pdf' ? 'pdf' : 'zip';
     let outputFilename = `converted.${outputExtension}`;
     if (file.name) {
@@ -155,7 +139,6 @@ export const convertPpt = async (file: File, format: 'pdf' | 'images') => {
             outputFilename = file.name.substring(0, dotIndex) + `.${outputExtension}`;
         }
     }
-
     await processFileResponse(response, outputFilename);
 };
 
@@ -165,7 +148,6 @@ export const convertSpreadsheet = async (file: File, format: 'pdf' | 'html') => 
     const endpoint = `${BASE_URL}/spreadsheet-convert/xls-to-${format}`;
     const response = await fetch(endpoint, { method: 'POST', body: formData });
     await handleApiResponse(response);
-
     let outputFilename = `converted.${format}`;
     if (file.name) {
         const dotIndex = file.name.lastIndexOf('.');
@@ -173,7 +155,6 @@ export const convertSpreadsheet = async (file: File, format: 'pdf' | 'html') => 
             outputFilename = file.name.substring(0, dotIndex) + `.${format}`;
         }
     }
-
     if (format === 'html') {
         const html = await response.text();
         const blob = new Blob([html], { type: 'text/html' });
@@ -187,15 +168,12 @@ export const convertSpreadsheet = async (file: File, format: 'pdf' | 'html') => 
 export const convertCsvXlsx = async (file: File) => {
     const formData = new FormData();
     formData.append('file', file);
-
     const isCsv = file.name.toLowerCase().endsWith('.csv');
     const endpoint = isCsv
         ? `${BASE_URL}/spreadsheet-convert/csv-to-xlsx`
         : `${BASE_URL}/spreadsheet-convert/xlsx-to-csv`;
-
     const response = await fetch(endpoint, { method: 'POST', body: formData });
     await handleApiResponse(response);
-
     const outputExtension = isCsv ? 'xlsx' : 'csv';
     let outputFilename = `converted.${outputExtension}`;
     if (file.name) {
@@ -204,7 +182,6 @@ export const convertCsvXlsx = async (file: File) => {
             outputFilename = file.name.substring(0, dotIndex) + `.${outputExtension}`;
         }
     }
-
     if (isCsv) {
         const blob = await response.blob();
         downloadFile(blob, outputFilename);
@@ -220,7 +197,6 @@ export const convertAudio = async (file: File, format: string) => {
     formData.append('file', file);
     formData.append('format', format);
     const response = await fetch(`${BASE_URL}/multimedia-convert/audio`, { method: 'POST', body: formData });
-
     let outputFilename = `converted.${format}`;
     if (file.name) {
         const dotIndex = file.name.lastIndexOf('.');
@@ -228,7 +204,6 @@ export const convertAudio = async (file: File, format: string) => {
             outputFilename = file.name.substring(0, dotIndex) + `.${format}`;
         }
     }
-
     await processFileResponse(response, outputFilename);
 };
 
@@ -237,7 +212,6 @@ export const convertVideo = async (file: File, format: string) => {
     formData.append('file', file);
     formData.append('format', format);
     const response = await fetch(`${BASE_URL}/multimedia-convert/video`, { method: 'POST', body: formData });
-
     let outputFilename = `converted.${format}`;
     if (file.name) {
         const dotIndex = file.name.lastIndexOf('.');
@@ -245,7 +219,6 @@ export const convertVideo = async (file: File, format: string) => {
             outputFilename = file.name.substring(0, dotIndex) + `.${format}`;
         }
     }
-
     await processFileResponse(response, outputFilename);
 };
 
