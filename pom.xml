@@ -42,7 +42,7 @@
         <module>ppt-convert</module>
         <module>spreadsheet-convert</module>
         <module>multimedia-convert</module>
-        
+        <module>syntax-highlighter</module>
     </modules>
 
     <dependencyManagement>
@@ -128,10 +128,14 @@
                 <artifactId>spreadsheet-convert</artifactId>
                 <version>${project.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>com.example</groupId>
                 <artifactId>multimedia-convert</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.example</groupId>
+                <artifactId>syntax-highlighter</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

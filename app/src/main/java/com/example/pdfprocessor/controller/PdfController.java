@@ -3,7 +3,7 @@ package com.example.pdfprocessor.controller;
 import com.example.pdfprocessor.api.PdfCompressService;
 import com.example.pdfprocessor.api.PdfMergeService;
 import com.example.pdfprocessor.api.PdfSplitService;
-import com.example.pdfprocessor.services.api.service.FileValidationService;
+import com.example.pdfprocessor.service.PdfService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -14,7 +14,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/pdfs")
@@ -23,28 +22,21 @@ public class PdfController {
     private final PdfMergeService pdfMergeService;
     private final PdfSplitService pdfSplitService;
     private final PdfCompressService pdfCompressService;
-    private final FileValidationService fileValidationService;
+    private final PdfService pdfService;
 
-    public PdfController(PdfMergeService pdfMergeService, PdfSplitService pdfSplitService, PdfCompressService pdfCompressService, FileValidationService fileValidationService) {
+    public PdfController(PdfMergeService pdfMergeService, PdfSplitService pdfSplitService,
+                         PdfCompressService pdfCompressService, PdfService pdfService) {
         this.pdfMergeService = pdfMergeService;
         this.pdfSplitService = pdfSplitService;
         this.pdfCompressService = pdfCompressService;
-        this.fileValidationService = fileValidationService;
+        this.pdfService = pdfService;
     }
 
     @PostMapping("/merge")
     public ResponseEntity<byte[]> mergePdfs(@RequestParam("files") List<MultipartFile> files) {
         try {
-            for (MultipartFile file : files) {
-                fileValidationService.validateFile(file);
-            }
-            List<InputStream> fileStreams = files.stream().map(file -> {
-                try {
-                    return file.getInputStream();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }).collect(Collectors.toList());
+            pdfService.validateFiles(files);
+            List<InputStream> fileStreams = pdfService.getFileInputStreams(files);
             byte[] mergedPdfBytes = pdfMergeService.mergePdfs(fileStreams);
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_PDF);
@@ -61,16 +53,8 @@ public class PdfController {
     public ResponseEntity<byte[]> splitPdfs(@RequestParam("files") List<MultipartFile> files,
                                            @RequestParam(required = false) String ranges) {
         try {
-            for (MultipartFile file : files) {
-                fileValidationService.validateFile(file);
-            }
-            List<InputStream> fileStreams = files.stream().map(file -> {
-                try {
-                    return file.getInputStream();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }).collect(Collectors.toList());
+            pdfService.validateFiles(files);
+            List<InputStream> fileStreams = pdfService.getFileInputStreams(files);
             byte[] resultBytes = pdfSplitService.splitPdfs(fileStreams, ranges);
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
@@ -86,16 +70,8 @@ public class PdfController {
     @PostMapping("/compress")
     public ResponseEntity<byte[]> compressPdfs(@RequestParam("files") List<MultipartFile> files) {
         try {
-            for (MultipartFile file : files) {
-                fileValidationService.validateFile(file);
-            }
-            List<InputStream> fileStreams = files.stream().map(file -> {
-                try {
-                    return file.getInputStream();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }).collect(Collectors.toList());
+            pdfService.validateFiles(files);
+            List<InputStream> fileStreams = pdfService.getFileInputStreams(files);
             byte[] compressedPdfBytes = pdfCompressService.compressPdfs(fileStreams);
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
