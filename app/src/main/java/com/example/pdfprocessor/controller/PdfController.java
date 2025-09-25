@@ -4,6 +4,8 @@ import com.example.pdfprocessor.api.PdfCompressService;
 import com.example.pdfprocessor.api.PdfMergeService;
 import com.example.pdfprocessor.api.PdfSplitService;
 import com.example.pdfprocessor.service.PdfService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -18,6 +20,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/pdfs")
 public class PdfController {
+
+    private static final Logger logger = LoggerFactory.getLogger(PdfController.class);
 
     private final PdfMergeService pdfMergeService;
     private final PdfSplitService pdfSplitService;
@@ -34,6 +38,7 @@ public class PdfController {
 
     @PostMapping("/merge")
     public ResponseEntity<byte[]> mergePdfs(@RequestParam("files") List<MultipartFile> files) {
+        logger.info("Received request to merge {} files", files.size());
         try {
             pdfService.validateFiles(files);
             List<InputStream> fileStreams = pdfService.getFileInputStreams(files);
@@ -41,10 +46,13 @@ public class PdfController {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_PDF);
             headers.setContentDispositionFormData("attachment", "merged.pdf");
+            logger.info("Successfully merged files");
             return new ResponseEntity<>(mergedPdfBytes, headers, HttpStatus.OK);
         } catch (IllegalArgumentException e) {
+            logger.error("Invalid argument for merging files", e);
             return ResponseEntity.badRequest().body(e.getMessage().getBytes());
         } catch (IOException e) {
+            logger.error("IO exception while merging files", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }

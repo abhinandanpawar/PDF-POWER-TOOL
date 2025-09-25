@@ -10,8 +10,8 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>syntax-highlighter</artifactId>
-    <name>syntax-highlighter</name>
+    <artifactId>doc-convert</artifactId>
+    <name>doc-convert</name>
     <packaging>jar</packaging>
 
     <dependencies>
@@ -20,13 +20,24 @@
             <artifactId>pdf-services-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.codelibs</groupId>
-            <artifactId>jhighlight</artifactId>
-            <version>1.1.0</version>
-        </dependency>
-        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <!-- For DOCX to PDF conversion -->
+        <dependency>
+            <groupId>org.docx4j</groupId>
+            <artifactId>docx4j-JAXB-ReferenceImpl</artifactId>
+            <version>8.3.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.docx4j</groupId>
+            <artifactId>docx4j-export-fo</artifactId>
+            <version>8.3.3</version>
+        </dependency>
+        <!-- For legacy .doc support -->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-scratchpad</artifactId>
         </dependency>
     </dependencies>
 
