@@ -1,38 +1,29 @@
-# Assignable Project Tasks
+# Recommended Tasks and Next Steps
 
-This file provides a high-level list of tasks that can be assigned to different Jules agents for parallel development. Please refer to `plan.md` for detailed phase descriptions.
+This document outlines the recommended tasks for the next phase of development, prioritized by importance.
 
----
+## High Priority
 
-### **Task 1 (Assigned to Jules, Current Assignee): Core Conversions**
-*   **Goal:** Complete the core document, presentation, audio, and video conversion features.
-*   **Action:** Finish the Spreadsheet converter, then build the Audio/Video converter.
-*   **Scope:** Finish Phase 2, Complete Phase 3.
+1.  **Fix Frontend Development Environment:**
+    - The Vite development server (`npm run dev`) is currently broken, which is a critical blocker for any frontend work. This needs to be investigated and fixed immediately.
 
----
+2.  **Address Insecure File Uploads:**
+    - The audit report mentioned insecure file uploads. The backend needs to be updated to validate file types and sizes more robustly.
+    - Implement filename sanitization to prevent path traversal attacks.
 
-### **Task 2 (Ready for Assignment): E-Books & Archives**
-*   **Goal:** Implement e-book and archive format conversions.
-*   **Action:** Build converters for E-Book formats (EPUB, MOBI) and Archives (ZIP, RAR).
-*   **Scope:** Phase 4.
+## Medium Priority
 
----
+3.  **Implement Frontend Routing:**
+    - Replace the current simple state management for views with `react-router-dom` to enable deep linking, improve navigation, and provide a better user experience.
 
-### **Task 3 (Ready for Assignment): Developer Tools**
-*   **Goal:** Implement syntax highlighting and font conversion tools.
-*   **Action:** Build the code syntax highlighter and font conversion tools.
-*   **Scope:** Phase 5.
+4.  **Increase Backend Test Coverage:**
+    - The audit report noted low test coverage. New unit and integration tests should be written for all backend services and controllers to improve code quality and prevent regressions.
 
----
+## Low Priority
 
-### **Task 4 (Ready for Assignment): Specialized Formats**
-*   **Goal:** Implement support for professional formats like CAD, GIS, and Databases.
-*   **Action:** Build converters for CAD, GIS, and Database files.
-*   **Scope:** Phase 6.
+5.  **UI/UX Polish:**
+    - **Improved User Feedback:** Enhance user feedback mechanisms, such as providing more informative loading indicators, success messages, and descriptive error notifications.
+    - **Responsive Design:** Ensure the application is fully responsive and usable on a variety of screen sizes, from mobile devices to large desktop monitors.
 
----
-
-### **Task 5 (Ready for Assignment): JavaScript Web Utilities**
-*   **Goal:** Build the new suite of client-side developer tools.
-*   **Action:** Build tools like the Diff Viewer, JSON Formatter, JWT Playground, etc.
-*   **Scope:** Phases A, B, C.
+6.  **Complete Incomplete Modules:**
+    - The `doc-convert` and `font-converter` modules were previously removed because they were incomplete. These modules should be completed and re-integrated into the application.

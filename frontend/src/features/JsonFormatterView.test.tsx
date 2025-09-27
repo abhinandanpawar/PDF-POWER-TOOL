@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '../src/tests/test-utils';
+import { render, screen, fireEvent } from '../tests/test-utils';
 import { describe, it, expect, vi } from 'vitest';
 import JsonFormatterView from './JsonFormatterView';
 import React from 'react';
