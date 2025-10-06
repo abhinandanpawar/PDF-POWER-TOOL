@@ -70,14 +70,16 @@ public class PdfSplitServiceImpl implements PdfSplitService {
                     newDocument.addPage(document.getPage(pageNum - 1));
                 }
             }
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            newDocument.save(outputStream);
-            System.out.println("New document has " + newDocument.getNumberOfPages() + " pages.");
+            if (newDocument.getNumberOfPages() > 0) {
+                ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                newDocument.save(outputStream);
+                System.out.println("New document has " + newDocument.getNumberOfPages() + " pages.");
 
-            ZipEntry zipEntry = new ZipEntry("file_" + fileNum + "_extracted.pdf");
-            zos.putNextEntry(zipEntry);
-            zos.write(outputStream.toByteArray());
-            zos.closeEntry();
+                ZipEntry zipEntry = new ZipEntry("file_" + fileNum + "_extracted.pdf");
+                zos.putNextEntry(zipEntry);
+                zos.write(outputStream.toByteArray());
+                zos.closeEntry();
+            }
         }
     }
 
@@ -87,16 +89,25 @@ public class PdfSplitServiceImpl implements PdfSplitService {
         String[] parts = ranges.split(",");
         for (String part : parts) {
             part = part.trim();
-            if (part.contains("-")) {
-                String[] range = part.split("-");
-                int start = Integer.parseInt(range[0]);
-                int end = Integer.parseInt(range[1]);
-                System.out.println("Range: start=" + start + ", end=" + end);
-                for (int i = start; i <= end; i++) {
-                    pageNumbers.add(i);
+            try {
+                if (part.contains("-")) {
+                    String[] range = part.split("-");
+                    if (range.length == 2) {
+                        int start = Integer.parseInt(range[0]);
+                        int end = Integer.parseInt(range[1]);
+                        if (start <= end) {
+                            System.out.println("Range: start=" + start + ", end=" + end);
+                            for (int i = start; i <= end; i++) {
+                                pageNumbers.add(i);
+                            }
+                        }
+                    }
+                } else {
+                    pageNumbers.add(Integer.parseInt(part));
                 }
-            } else {
-                pageNumbers.add(Integer.parseInt(part));
+            } catch (NumberFormatException e) {
+                // Ignore invalid number formats
+                System.err.println("Invalid number format in range: " + part);
             }
         }
         return pageNumbers;
