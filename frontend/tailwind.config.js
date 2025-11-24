@@ -8,81 +8,53 @@ export default {
     extend: {
       colors: {
         primary: {
-          DEFAULT: 'hsl(210, 100%, 50%)',
-          foreground: 'hsl(210, 100%, 98%)',
-          50: 'hsl(210, 100%, 95%)',
-          100: 'hsl(210, 100%, 90%)',
-          200: 'hsl(210, 100%, 80%)',
-          300: 'hsl(210, 100%, 70%)',
-          400: 'hsl(210, 100%, 60%)',
-          500: 'hsl(210, 100%, 50%)',
-          600: 'hsl(210, 100%, 40%)',
-          700: 'hsl(210, 100%, 30%)',
-          800: 'hsl(210, 100%, 20%)',
-          900: 'hsl(210, 100%, 10%)',
+          DEFAULT: '#00f2ff', // Neon Cyan
+          foreground: '#050505',
+          glow: '#00f2ffaa',
         },
         secondary: {
-          DEFAULT: 'hsl(240, 6%, 10%)',
-          foreground: 'hsl(240, 5%, 96%)',
-        },
-        destructive: {
-          DEFAULT: 'hsl(0, 84%, 60%)',
-          foreground: 'hsl(0, 0%, 98%)',
-        },
-        muted: {
-          DEFAULT: 'hsl(240, 4%, 46%)',
-          foreground: 'hsl(240, 4%, 65%)',
+          DEFAULT: '#7000ff', // Neon Purple
+          foreground: '#ffffff',
+          glow: '#7000ffaa',
         },
         accent: {
-          DEFAULT: 'hsl(240, 6%, 10%)',
-          foreground: 'hsl(240, 5%, 96%)',
+          DEFAULT: '#ff003c', // Cyberpunk Red
+          foreground: '#ffffff',
         },
-        popover: {
-          DEFAULT: 'hsl(240, 10%, 4%)',
-          foreground: 'hsl(240, 5%, 96%)',
-        },
-        card: {
-          DEFAULT: 'hsl(240, 10%, 4%)',
-          foreground: 'hsl(240, 5%, 96%)',
-        },
-        background: 'hsl(240, 10%, 4%)',
-        foreground: 'hsl(0, 0%, 98%)',
-        border: 'hsl(240, 4%, 16%)',
-        input: 'hsl(240, 4%, 16%)',
-        ring: 'hsl(210, 100%, 50%)',
-      },
-      borderRadius: {
-        lg: `1rem`,
-        md: `calc(1rem - 2px)`,
-        sm: `calc(1rem - 4px)`,
+        background: '#050505', // Almost Black
+        surface: '#0a0a0a', // Dark Gray
+        'surface-highlight': '#121212',
+        border: '#333333',
+        'border-highlight': '#555555',
+        foreground: '#e0e0e0', // Light Gray Text
+        'muted-foreground': '#a0a0a0',
       },
       fontFamily: {
-        sans: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', 'sans-serif'],
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+        mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
+        display: ['Orbitron', 'sans-serif'], // Futuristic font
       },
       boxShadow: {
-        'xs': '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
-        'sm': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-        'md': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
-        'lg': '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
-        'xl': '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-        '2xl': '0 35px 60px -15px rgba(0, 0, 0, 0.3)',
-        'inner': 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)',
-        'outline': '0 0 0 3px rgba(66, 153, 225, 0.5)',
+        'neon-blue': '0 0 5px theme("colors.primary.DEFAULT"), 0 0 20px theme("colors.primary.glow")',
+        'neon-purple': '0 0 5px theme("colors.secondary.DEFAULT"), 0 0 20px theme("colors.secondary.glow")',
+        'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.37)',
       },
-      keyframes: {
-        fadeIn: {
-          'from': { opacity: '0' },
-          'to': { opacity: '1' },
-        },
-        fadeInRight: {
-          'from': { opacity: '0', transform: 'translateX(100%)' },
-          'to': { opacity: '1', transform: 'translateX(0)' },
-        },
+      backgroundImage: {
+        'cyber-grid': "radial-gradient(circle, #333 1px, transparent 1px)",
+        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+        'hero-glow': 'conic-gradient(from 180deg at 50% 50%, #00f2ff 0deg, #7000ff 180deg, #00f2ff 360deg)',
       },
       animation: {
-        'fade-in': 'fadeIn 0.5s ease-out forwards',
-        'fade-in-right': 'fadeInRight 0.5s ease-out forwards',
+        'spin-slow': 'spin 3s linear infinite',
+        'pulse-fast': 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'float': 'float 6s ease-in-out infinite',
       },
+      keyframes: {
+        float: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-20px)' },
+        }
+      }
     },
   },
   plugins: [
