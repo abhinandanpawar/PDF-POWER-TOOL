@@ -28,7 +28,7 @@ public class PdfSplitServiceImplTest {
         InputStream pdfStream = new ByteArrayInputStream(pdf);
 
         // Split the PDF
-        byte[] zipBytes = pdfSplitService.split(pdfStream);
+        byte[] zipBytes = pdfSplitService.splitPdfs(List.of(pdfStream), null);
 
         // Verify the created ZIP file
         assertNotNull(zipBytes);
