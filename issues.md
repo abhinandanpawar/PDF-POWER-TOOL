@@ -8,16 +8,15 @@ This document outlines potential issues, bugs, and areas for improvement identif
 
 *   **[RESOLVED] Duplicate `Tool` enum entries:** The `Tool` enum in `types.ts` had duplicate entries for `CadConvert`. This has been resolved.
 *   **[RESOLVED] `ImageEditorView.tsx` has a bug:** The `handleDimensionChange` function was defined twice. This has been resolved.
+*   **[RESOLVED] `ConfigConverterView.tsx` has a potential bug:** The XML to JSON conversion is using `xml-js` which might not handle all XML structures correctly. Also, the error handling is basic. Consider using a more robust XML parsing library and providing more informative error messages.
+*   **[RESOLVED] `PasswordGeneratorView.tsx` has a potential bug:** The password generation logic could be improved to ensure a more random distribution of characters.
+*   **[RESOLVED] `TimelineRoadmapBuilderView.tsx` has a potential bug:** The drag and drop functionality is basic and could be improved with better visual feedback and constraints.
 
 ### Refactoring and Improvements
 
 *   **[RESOLVED] Inconsistent `FileUpload` component:** The `FileUpload` component usage has been centralized and refactored across relevant feature files.
 *   **[RESOLVED] Redundant code in `features/*.tsx` files:** Common logic for file uploads, loading states, and toasts has been abstracted into the `useToolLogic` hook, and relevant feature components have been refactored to use it.
 *   **Inconsistent styling:** There are some inconsistencies in styling across different components. A style guide and a more consistent use of the design system would improve the overall look and feel of the application. (Partial: `Button.tsx` has been updated for better consistency).
-*   **`ConfigConverterView.tsx` has a potential bug:** The XML to JSON conversion is using `xml-js` which might not handle all XML structures correctly. Also, the error handling is basic. Consider using a more robust XML parsing library and providing more informative error messages.
-*   **`PasswordGeneratorView.tsx` has a potential bug:** The password generation logic could be improved to ensure a more random distribution of characters.
-*   **`TimelineRoadmapBuilderView.tsx` has a potential bug:** The drag and drop functionality is basic and could be improved with better visual feedback and constraints.
-
 
 ### Testing
 
@@ -27,12 +26,12 @@ This document outlines potential issues, bugs, and areas for improvement identif
 
 ### Bugs
 
-*   **`FontConverterServiceImpl.java`:** The `woff` to `ttf` conversion assumes the input is `woff`, which might not always be the case. The implementation should be more robust and ideally auto-detect the input format to avoid unexpected errors.
+*   **[RESOLVED] `FontConverterServiceImpl.java`:** The `woff` to `ttf` conversion assumes the input is `woff`, which might not always be the case. The implementation should be more robust and ideally auto-detect the input format to avoid unexpected errors.
 
 ### Refactoring and Improvements
 
-*   **`CadConvertController.java`:** The controller handles all the logic for the conversion. This should be refactored into a service layer to separate concerns and improve the overall architecture of the application.
-*   **Basic exception handling:** The exception handling in the backend is very basic. It should be improved to provide more meaningful error messages to the user and to log errors effectively.
+*   **`CadConvertController.java`:** The controller handles all the logic for the conversion. This should be refactored into a service layer to separate concerns and improve the overall architecture of the application. **Note:** The `cad-convert` module appears to be missing or removed.
+*   **[RESOLVED] Basic exception handling:** The exception handling in the backend is very basic. It should be improved to provide more meaningful error messages to the user and to log errors effectively.
 
 ### Testing
 
@@ -62,4 +61,5 @@ The following dependencies are deprecated and should be updated:
 
 ## Build Issues
 
-*   **[TEMPORARILY RESOLVED] `cad-convert` module build failure:** The `cad-convert` module was failing to build due to an unresolved `kabeja` dependency. This module has been temporarily removed from the parent `pom.xml` to allow the rest of the application to build successfully. A more robust solution for DXF to PDF conversion should be investigated separately.
+*   **[RESOLVED] `cad-convert` module build failure:** The `cad-convert` module was failing to build due to an unresolved `kabeja` dependency. This module has been temporarily removed from the parent `pom.xml` to allow the rest of the application to build successfully. A more robust solution for DXF to PDF conversion should be investigated separately.
+*   **[RESOLVED] `font-converter` build issues:** The `font-converter` module had dependency issues which have been resolved.
