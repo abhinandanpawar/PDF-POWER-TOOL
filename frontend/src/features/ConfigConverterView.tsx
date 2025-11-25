@@ -31,22 +31,27 @@ const ConfigConverterView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         case 'json':
           try {
             data = JSON.parse(inputText);
-          } catch (e) {
-            throw new Error('Invalid JSON format.');
+          } catch (e: any) {
+            throw new Error(`Invalid JSON format: ${e.message}`);
           }
           break;
         case 'yaml':
           try {
             data = yaml.load(inputText);
-          } catch (e) {
-            throw new Error('Invalid YAML format.');
+          } catch (e: any) {
+            throw new Error(`Invalid YAML format: ${e.message}`);
           }
           break;
         case 'xml':
           try {
-            data = JSON.parse(xml2json(inputText, { compact: true }));
-          } catch (e) {
-            throw new Error('Invalid XML format.');
+             // Basic check for XML validity before parsing if possible, or catch parser errors
+            const result = xml2json(inputText, { compact: true });
+            data = JSON.parse(result);
+            if (!data || Object.keys(data).length === 0) {
+                 throw new Error("Empty or invalid XML");
+            }
+          } catch (e: any) {
+            throw new Error(`Invalid XML format: ${e.message}`);
           }
           break;
       }
@@ -61,11 +66,26 @@ const ConfigConverterView: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           result = yaml.dump(data);
           break;
         case 'xml':
-          const xmlData = JSON.stringify({_declaration: { _attributes: { version: '1.0', encoding: 'utf-8' } }, ...data});
-          result = json2xml(xmlData, { compact: true, spaces: 2 });
+           try {
+              // Ensure data has a root element for XML
+              // If data is an array or primitive, it needs wrapping
+              let xmlObj = data;
+              if (!data || typeof data !== 'object' || Array.isArray(data) || Object.keys(data).length > 1 || (Object.keys(data).length === 1 && Object.keys(data)[0] === '_declaration')) {
+                   // Wrap in a root element if it doesn't look like a single root document
+                   xmlObj = { root: data };
+              }
+
+              // Ensure declaration exists
+              if (!xmlObj._declaration) {
+                  xmlObj = { _declaration: { _attributes: { version: '1.0', encoding: 'utf-8' } }, ...xmlObj };
+              }
+              result = json2xml(JSON.stringify(xmlObj), { compact: true, spaces: 2 });
+           } catch(e: any) {
+               throw new Error(`Error generating XML: ${e.message}`);
+           }
           break;
       }
-      setOutputText(result);
+      setOutputText(result!);
       addToast({ type: 'success', message: 'Conversion successful!' });
     } catch (error: any) {
       setOutputText('');

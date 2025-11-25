@@ -43,6 +43,7 @@
         <module>spreadsheet-convert</module>
         <module>multimedia-convert</module>
         <module>syntax-highlighter</module>
+        <module>font-converter</module>
     </modules>
 
     <dependencyManagement>

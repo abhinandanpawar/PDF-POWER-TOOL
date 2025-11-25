@@ -8,10 +8,14 @@ interface PasswordGeneratorViewProps {
   onBack: () => void;
 }
 
+// Improved random function to avoid modulo bias
 const secureRandom = (max: number) => {
-  const randomValues = new Uint32Array(1);
-  crypto.getRandomValues(randomValues);
-  return randomValues[0] % max;
+  const limit = 0xFFFFFFFF - (0xFFFFFFFF % max);
+  const buffer = new Uint32Array(1);
+  do {
+    crypto.getRandomValues(buffer);
+  } while (buffer[0] >= limit);
+  return buffer[0] % max;
 };
 
 const CHARSETS = {
@@ -36,6 +40,7 @@ const PasswordGeneratorView: React.FC<PasswordGeneratorViewProps> = ({ onBack })
     let charset = '';
     let requiredChars = [];
 
+    // Ensure we have at least one character from each selected set
     if (includeLowercase) {
       charset += CHARSETS.LOWERCASE;
       requiredChars.push(CHARSETS.LOWERCASE[secureRandom(CHARSETS.LOWERCASE.length)]);
@@ -61,21 +66,21 @@ const PasswordGeneratorView: React.FC<PasswordGeneratorViewProps> = ({ onBack })
     let newPassword = [...requiredChars];
     const remainingLength = length - newPassword.length;
 
-    if (remainingLength > 0) {
-        const randomValues = new Uint32Array(remainingLength);
-        crypto.getRandomValues(randomValues);
-        for (let i = 0; i < remainingLength; i++) {
-            newPassword.push(charset[randomValues[i] % charset.length]);
-        }
+    // Fill the rest of the password
+    for (let i = 0; i < remainingLength; i++) {
+        newPassword.push(charset[secureRandom(charset.length)]);
     }
 
-    // Shuffle the array to mix required chars with random chars
+    // Shuffle the array to mix required chars with random chars using Fisher-Yates
     for (let i = newPassword.length - 1; i > 0; i--) {
         const j = secureRandom(i + 1);
         [newPassword[i], newPassword[j]] = [newPassword[j], newPassword[i]];
     }
 
+    // If result is longer than requested (e.g. length 3 but 4 types selected), trim it.
+    // Ideally user shouldn't select length < types.
     const finalPassword = newPassword.slice(0, length).join('');
+
     setPassword(finalPassword);
     setStrength(zxcvbn(finalPassword));
 
@@ -102,7 +107,7 @@ const PasswordGeneratorView: React.FC<PasswordGeneratorViewProps> = ({ onBack })
       <div className="space-y-6 max-w-2xl mx-auto">
         {/* Password Display */}
         <div className="flex items-center gap-2 p-4 bg-background-alt border border-border rounded-lg">
-          <span className="flex-grow font-mono text-lg text-text-primary truncate">{password}</span>
+          <span className="flex-grow font-mono text-lg text-text-primary truncate break-all">{password}</span>
           <button onClick={handleGeneratePassword} title="Generate new password" className="p-2 text-text-secondary hover:text-primary transition-colors"><RefreshCw className="h-5 w-5" /></button>
           <button onClick={handleCopyPassword} title="Copy password" className="p-2 text-text-secondary hover:text-primary transition-colors"><Copy className="h-5 w-5" /></button>
         </div>
@@ -140,7 +145,7 @@ const PasswordGeneratorView: React.FC<PasswordGeneratorViewProps> = ({ onBack })
             <input
               type="range"
               id="length"
-              min="8"
+              min="4"
               max="64"
               value={length}
               onChange={(e) => setLength(Number(e.target.value))}
