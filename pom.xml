@@ -21,6 +21,7 @@
         <java.version>21</java.version>
         <pdfbox.version>3.0.5</pdfbox.version>
         <poi.version>5.4.1</poi.version>
+    <aspose.cad.version>24.5</aspose.cad.version>
     </properties>
 
     <modules>
@@ -44,6 +45,7 @@
         <module>multimedia-convert</module>
         <module>syntax-highlighter</module>
         <module>font-converter</module>
+        <module>cad-convert</module>
     </modules>
 
     <dependencyManagement>

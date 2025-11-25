@@ -8,7 +8,7 @@ import io.swagger.v3.oas.annotations.info.Info;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = {"com.example.pdfprocessor", "com.example.cadconvert"})
 @OpenAPIDefinition(info = @Info(title = "PDF Processor API", version = "1.0", description = "API for processing and manipulating PDF documents"))
 public class PdfProcessorApplication {
 

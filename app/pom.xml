@@ -80,6 +80,11 @@
             <groupId>com.example</groupId>
             <artifactId>markdown-convert</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.example</groupId>
+            <artifactId>cad-convert</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <!-- Spring Boot -->
         <dependency>
